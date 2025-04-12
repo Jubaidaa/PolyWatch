@@ -125,11 +125,3 @@ struct RegistrationView: View {
     }
 }
 
-
-struct PoliticsApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
