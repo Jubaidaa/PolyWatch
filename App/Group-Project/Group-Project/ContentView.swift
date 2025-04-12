@@ -1,78 +1,128 @@
 import SwiftUI
 
+// Model for the carousel articles
+struct ArticleItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let imageName: String
+}
+
 struct ContentView: View {
+    
+    @State private var currentIndex = 0
+    // Timer fires every 4.5 seconds for automatic slide transition
+    let carouselTimer = Timer.publish(every: 4.5, on: .main, in: .common)
+        .autoconnect()
+    
+    // Example data – ensure these images ("news1", "news2", "news3", "sideicon") are in your Assets
+    let articles = [
+        ArticleItem(title: "Breaking News: SwiftUI Tips", imageName: "news1"),
+        ArticleItem(title: "Latest Trends in Tech", imageName: "news2"),
+        ArticleItem(title: "Inside PolyWatch Updates", imageName: "news3")
+    ]
+    
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                Text("Get Involved in Politics")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.purple)
-                    .padding()
-
-                NavigationLink(destination: VoteView()) {
-                    ButtonView(title: "VOTE", systemImage: "hand.thumbsup")
+            VStack {
+                // Top Bar with side icon and app name
+                HStack {
+                    // Tap on the icon can trigger a menu or a new screen if needed
+                    Button {
+                        // Add any action if necessary
+                    } label: {
+                        Image("sideicon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40)
+                    }
+                    
+                    Spacer()
+                    
+                    Text("PolyWatch")
+                        .font(.headline)
+                    
+                    Spacer()
+                    
+                    // Placeholder for a search or profile button
+                    Button {
+                        // Add your action here
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .font(.headline)
+                    }
                 }
-
-                NavigationLink(destination: NewsFeedView()) {
-                    ButtonView(title: "Local News", systemImage: "newspaper")
+                .padding(.horizontal)
+                .padding(.top, 8)
+                
+                // Carousel displaying article images and titles; auto-scrolls every 4.5 seconds
+                ZStack {
+                    if !articles.isEmpty {
+                        TabView(selection: $currentIndex) {
+                            ForEach(articles.indices, id: \.self) { index in
+                                VStack(spacing: 8) {
+                                    Image(articles[index].imageName)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 200)
+                                        .cornerRadius(8)
+                                    
+                                    Text(articles[index].title)
+                                        .font(.headline)
+                                        .foregroundColor(.purple)
+                                }
+                                .tag(index)
+                                .padding()
+                            }
+                        }
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+                        .frame(height: 280)
+                        .onReceive(carouselTimer) { _ in
+                            withAnimation(.easeInOut) {
+                                currentIndex = (currentIndex + 1) % articles.count
+                            }
+                        }
+                    } else {
+                        Text("No articles available")
+                            .foregroundColor(.gray)
+                    }
                 }
-
-                NavigationLink(destination: UpcomingElectionsView()) {
-                    ButtonView(title: "Upcoming Elections", systemImage: "calendar")
+                .padding(.vertical, 20)
+                
+                // Buttons for Upcoming Elections and Events
+                HStack(spacing: 20) {
+                    NavigationLink(destination: UpcomingElectionsView()) {
+                        Text("Upcoming Elections")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.purple)
+                            .cornerRadius(8)
+                    }
+                    
+                    NavigationLink(destination: EventsView()) {
+                        Text("Events")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.purple)
+                            .cornerRadius(8)
+                    }
                 }
-
-                NavigationLink(destination: EventsView()) {
-                    ButtonView(title: "Events", systemImage: "megaphone")
-                }
-
-                NavigationLink(destination: RegistrationView()) {
-                    ButtonView(title: "Register to Vote", systemImage: "person.badge.plus")
-                }
-
+                .padding(.horizontal)
+                .padding(.bottom, 20)
+                
                 Spacer()
             }
-            .padding()
-            .background(
-                Color(red: 252/255, green: 251/255, blue: 250/255)
-                    .ignoresSafeArea()
-            )
+            // Using your off-white background: #FCFBFA (RGB: 252, 251, 250)
+            .background(Color(red: 252/255, green: 251/255, blue: 250/255))
+            .ignoresSafeArea()
         }
     }
 }
 
-struct ButtonView: View {
-    let title: String
-    let systemImage: String
-
-    var body: some View {
-        HStack {
-            Image(systemName: systemImage)
-                .font(.headline)
-            Text(title)
-                .font(.headline)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color.purple.opacity(0.9))
-        .foregroundColor(.white)
-        .cornerRadius(10)
-        .shadow(radius: 5)
-        .padding(.horizontal, 40)
-    }
-}
-
-struct VoteView: View {
-    var body: some View {
-        VStack {
-            Text("Thank you for participating!")
-                .font(.title)
-                .padding()
-        }
-        .navigationTitle("Vote")
-    }
-}
-
+// Dummy view for Upcoming Elections – adjust as needed
 struct UpcomingElectionsView: View {
     var body: some View {
         VStack {
@@ -84,10 +134,11 @@ struct UpcomingElectionsView: View {
     }
 }
 
+// Dummy view for Events – adjust as needed
 struct EventsView: View {
     var body: some View {
         VStack {
-            Text("Upcoming Events")
+            Text("Events")
                 .font(.title)
                 .padding()
         }
@@ -95,30 +146,8 @@ struct EventsView: View {
     }
 }
 
-struct RegistrationView: View {
-    var body: some View {
-        VStack(spacing: 20) {
-            Text(NSLocalizedString("check_registration", comment: "Check your registration status"))
-                .font(.headline)
-                .multilineTextAlignment(.center)
-
-            Link(NSLocalizedString("check_status", comment: "Check Status"), destination: URL(string: "https://voterstatus.sos.ca.gov/")!)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.purple.opacity(0.8))
-                .foregroundColor(.white)
-                .cornerRadius(8)
-
-            Text(NSLocalizedString("not_registered", comment: "If you're not registered, you can register below:"))
-
-            Link(NSLocalizedString("register_to_vote", comment: "Register to Vote"), destination: URL(string: "https://registertovote.ca.gov/")!)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.purple.opacity(0.8))
-                .foregroundColor(.white)
-                .cornerRadius(8)
-        }
-        .padding()
-        .navigationTitle(NSLocalizedString("registration", comment: "Registration"))
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
     }
 }
