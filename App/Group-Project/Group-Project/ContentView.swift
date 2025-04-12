@@ -36,37 +36,48 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 // MARK: - Top Bar (Red)
                 HStack {
-                    // Left icon (optional tap action)
-                    Button {
-                        // e.g., open side menu
+                    // Menu Button
+                    Menu {
+                        Button("Upcoming Events") {
+                            // Action for upcoming events
+                        }
+                        Button("Register to Votes") {
+                            // Action for register to votes
+                        }
+                        Button("Local News") {
+                            // Action for local news
+                        }
+                        Button("Breaking News") {
+                            // Action for breaking news
+                        }
                     } label: {
-                        Image("sideicon") // Replace with your side icon asset
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40)
+                        Image(systemName: "line.3.horizontal")
+                            .font(.system(size: 28))
+                            .foregroundColor(whiteColor)
                     }
                     
                     Spacer()
                     
-                    // App Name in Center
-                    Text("PolyWatch")
-                        .font(.headline)
-                        .foregroundColor(whiteColor)
+                    // Center logo
+                    Image("sideicon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 250, height: 80)
                     
                     Spacer()
                     
-                    // Right icon (e.g., search) – optional
+                    // Right magnifying glass icon
                     Button {
-                        // e.g., search action
+                        // Search action
                     } label: {
                         Image(systemName: "magnifyingglass")
-                            .font(.title)
+                            .font(.system(size: 28))
                             .foregroundColor(whiteColor)
                     }
                 }
                 .padding(.horizontal)
-                .padding(.vertical, 8)
-                .frame(height: 60)
+                .padding(.vertical, 12)
+                .frame(height: 100) // Back to previous height
                 .background(redColor)
                 
                 Spacer()
