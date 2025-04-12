@@ -7,37 +7,35 @@ struct ContentView: View {
                 Text("Get Involved in Politics")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(.purple)
                     .padding()
-                
+
                 NavigationLink(destination: VoteView()) {
                     ButtonView(title: "VOTE", systemImage: "hand.thumbsup")
                 }
-                
+
                 NavigationLink(destination: NewsFeedView()) {
                     ButtonView(title: "Local News", systemImage: "newspaper")
                 }
-                
+
                 NavigationLink(destination: UpcomingElectionsView()) {
                     ButtonView(title: "Upcoming Elections", systemImage: "calendar")
                 }
-                
+
                 NavigationLink(destination: EventsView()) {
                     ButtonView(title: "Events", systemImage: "megaphone")
                 }
-                
+
                 NavigationLink(destination: RegistrationView()) {
                     ButtonView(title: "Register to Vote", systemImage: "person.badge.plus")
                 }
-                
+
                 Spacer()
             }
             .padding()
             .background(
-                LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.8), Color.purple.opacity(0.5)]),
-                             startPoint: .top,
-                             endPoint: .bottom)
-                .ignoresSafeArea()
+                Color(red: 252/255, green: 251/255, blue: 250/255)
+                    .ignoresSafeArea()
             )
         }
     }
@@ -46,7 +44,7 @@ struct ContentView: View {
 struct ButtonView: View {
     let title: String
     let systemImage: String
-    
+
     var body: some View {
         HStack {
             Image(systemName: systemImage)
@@ -56,8 +54,8 @@ struct ButtonView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color.white)
-        .foregroundColor(.purple)
+        .background(Color.purple.opacity(0.9))
+        .foregroundColor(.white)
         .cornerRadius(10)
         .shadow(radius: 5)
         .padding(.horizontal, 40)
@@ -124,4 +122,3 @@ struct RegistrationView: View {
         .navigationTitle(NSLocalizedString("registration", comment: "Registration"))
     }
 }
-
