@@ -24,9 +24,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		094FF3D92DAA0D6600164DEB /* Group-Project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Group-Project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		094FF3E92DAA0D6800164DEB /* Group-ProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Group-ProjectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		094FF3F32DAA0D6800164DEB /* Group-ProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Group-ProjectUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		094FF3D92DAA0D6600164DEB /* PolyWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PolyWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		094FF3E92DAA0D6800164DEB /* PolyWatchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PolyWatchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		094FF3F32DAA0D6800164DEB /* PolyWatchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PolyWatchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -85,9 +85,9 @@
 		094FF3DA2DAA0D6600164DEB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				094FF3D92DAA0D6600164DEB /* Group-Project.app */,
-				094FF3E92DAA0D6800164DEB /* Group-ProjectTests.xctest */,
-				094FF3F32DAA0D6800164DEB /* Group-ProjectUITests.xctest */,
+				094FF3D92DAA0D6600164DEB /* PolyWatch.app */,
+				094FF3E92DAA0D6800164DEB /* PolyWatchTests.xctest */,
+				094FF3F32DAA0D6800164DEB /* PolyWatchUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		094FF3D82DAA0D6600164DEB /* Group-Project */ = {
+		094FF3D82DAA0D6600164DEB /* PolyWatch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 094FF3FD2DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "Group-Project" */;
+			buildConfigurationList = 094FF3FD2DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "PolyWatch" */;
 			buildPhases = (
 				094FF3D52DAA0D6600164DEB /* Sources */,
 				094FF3D62DAA0D6600164DEB /* Frameworks */,
@@ -110,16 +110,16 @@
 			fileSystemSynchronizedGroups = (
 				094FF3DB2DAA0D6600164DEB /* Group-Project */,
 			);
-			name = "Group-Project";
+			name = PolyWatch;
 			packageProductDependencies = (
 			);
 			productName = "Group-Project";
-			productReference = 094FF3D92DAA0D6600164DEB /* Group-Project.app */;
+			productReference = 094FF3D92DAA0D6600164DEB /* PolyWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
-		094FF3E82DAA0D6800164DEB /* Group-ProjectTests */ = {
+		094FF3E82DAA0D6800164DEB /* PolyWatchTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 094FF4002DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "Group-ProjectTests" */;
+			buildConfigurationList = 094FF4002DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "PolyWatchTests" */;
 			buildPhases = (
 				094FF3E52DAA0D6800164DEB /* Sources */,
 				094FF3E62DAA0D6800164DEB /* Frameworks */,
@@ -133,16 +133,16 @@
 			fileSystemSynchronizedGroups = (
 				094FF3EC2DAA0D6800164DEB /* Group-ProjectTests */,
 			);
-			name = "Group-ProjectTests";
+			name = PolyWatchTests;
 			packageProductDependencies = (
 			);
 			productName = "Group-ProjectTests";
-			productReference = 094FF3E92DAA0D6800164DEB /* Group-ProjectTests.xctest */;
+			productReference = 094FF3E92DAA0D6800164DEB /* PolyWatchTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		094FF3F22DAA0D6800164DEB /* Group-ProjectUITests */ = {
+		094FF3F22DAA0D6800164DEB /* PolyWatchUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 094FF4032DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "Group-ProjectUITests" */;
+			buildConfigurationList = 094FF4032DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "PolyWatchUITests" */;
 			buildPhases = (
 				094FF3EF2DAA0D6800164DEB /* Sources */,
 				094FF3F02DAA0D6800164DEB /* Frameworks */,
@@ -156,11 +156,11 @@
 			fileSystemSynchronizedGroups = (
 				094FF3F62DAA0D6800164DEB /* Group-ProjectUITests */,
 			);
-			name = "Group-ProjectUITests";
+			name = PolyWatchUITests;
 			packageProductDependencies = (
 			);
 			productName = "Group-ProjectUITests";
-			productReference = 094FF3F32DAA0D6800164DEB /* Group-ProjectUITests.xctest */;
+			productReference = 094FF3F32DAA0D6800164DEB /* PolyWatchUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 094FF3D42DAA0D6600164DEB /* Build configuration list for PBXProject "Group-Project" */;
+			buildConfigurationList = 094FF3D42DAA0D6600164DEB /* Build configuration list for PBXProject "PolyWatch" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				094FF3D82DAA0D6600164DEB /* Group-Project */,
-				094FF3E82DAA0D6800164DEB /* Group-ProjectTests */,
-				094FF3F22DAA0D6800164DEB /* Group-ProjectUITests */,
+				094FF3D82DAA0D6600164DEB /* PolyWatch */,
+				094FF3E82DAA0D6800164DEB /* PolyWatchTests */,
+				094FF3F22DAA0D6800164DEB /* PolyWatchUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		094FF3EB2DAA0D6800164DEB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 094FF3D82DAA0D6600164DEB /* Group-Project */;
+			target = 094FF3D82DAA0D6600164DEB /* PolyWatch */;
 			targetProxy = 094FF3EA2DAA0D6800164DEB /* PBXContainerItemProxy */;
 		};
 		094FF3F52DAA0D6800164DEB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 094FF3D82DAA0D6600164DEB /* Group-Project */;
+			target = 094FF3D82DAA0D6600164DEB /* PolyWatch */;
 			targetProxy = 094FF3F42DAA0D6800164DEB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -458,7 +458,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Group-Project.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Group-Project";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PolyWatch.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PolyWatch";
 			};
 			name = Debug;
 		};
@@ -476,7 +476,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Group-Project.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Group-Project";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PolyWatch.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PolyWatch";
 			};
 			name = Release;
 		};
@@ -515,7 +515,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		094FF3D42DAA0D6600164DEB /* Build configuration list for PBXProject "Group-Project" */ = {
+		094FF3D42DAA0D6600164DEB /* Build configuration list for PBXProject "PolyWatch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				094FF3FB2DAA0D6800164DEB /* Debug */,
@@ -524,7 +524,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		094FF3FD2DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "Group-Project" */ = {
+		094FF3FD2DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "PolyWatch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				094FF3FE2DAA0D6800164DEB /* Debug */,
@@ -533,7 +533,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		094FF4002DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "Group-ProjectTests" */ = {
+		094FF4002DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "PolyWatchTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				094FF4012DAA0D6800164DEB /* Debug */,
@@ -542,7 +542,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		094FF4032DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "Group-ProjectUITests" */ = {
+		094FF4032DAA0D6800164DEB /* Build configuration list for PBXNativeTarget "PolyWatchUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				094FF4042DAA0D6800164DEB /* Debug */,
