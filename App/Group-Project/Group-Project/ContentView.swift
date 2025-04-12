@@ -1,6 +1,6 @@
 import SwiftUI
 
-// Model for the carousel articles
+// MARK: - Model for Carousel Articles
 struct ArticleItem: Identifiable {
     let id = UUID()
     let title: String
@@ -8,54 +8,70 @@ struct ArticleItem: Identifiable {
 }
 
 struct ContentView: View {
-    
-    @State private var currentIndex = 0
-    // Timer fires every 4.5 seconds for automatic slide transition
-    let carouselTimer = Timer.publish(every: 4.5, on: .main, in: .common)
-        .autoconnect()
-    
-    // Example data – ensure these images ("news1", "news2", "news3", "sideicon") are in your Assets
-    let articles = [
+    // Example data for the carousel
+    private let articles: [ArticleItem] = [
         ArticleItem(title: "Breaking News: SwiftUI Tips", imageName: "news1"),
         ArticleItem(title: "Latest Trends in Tech", imageName: "news2"),
         ArticleItem(title: "Inside PolyWatch Updates", imageName: "news3")
     ]
     
+    // Carousel state
+    @State private var currentIndex = 0
+    
+    // Auto-scroll timer (4.5 seconds)
+    let carouselTimer = Timer.publish(every: 4.5, on: .main, in: .common)
+        .autoconnect()
+    
     var body: some View {
-        NavigationStack {
-            VStack {
-                // Top Bar with side icon and app name
+        ZStack {
+            // Background color (#FCFBFA)
+            Color(red: 252/255, green: 251/255, blue: 250/255)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                
+                // MARK: - Red Top Bar
                 HStack {
-                    // Tap on the icon can trigger a menu or a new screen if needed
+                    // Left icon (tap action optional)
                     Button {
-                        // Add any action if necessary
+                        // e.g., show side menu
                     } label: {
-                        Image("sideicon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40)
+                        Image(systemName: "sidebar.left") // Replace with your own icon
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .padding(.leading)
                     }
                     
                     Spacer()
                     
+                    // App Name in Center
                     Text("PolyWatch")
                         .font(.headline)
+                        .foregroundColor(.white)
                     
                     Spacer()
                     
-                    // Placeholder for a search or profile button
+                    // Right icon (search or profile), optional
                     Button {
-                        // Add your action here
+                        // e.g., search action
                     } label: {
                         Image(systemName: "magnifyingglass")
-                            .font(.headline)
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .padding(.trailing)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
+                .frame(height: 60)
+                .background(Color.red)
                 
-                // Carousel displaying article images and titles; auto-scrolls every 4.5 seconds
+                Spacer()
+                
+                // MARK: - Blue Box (Carousel)
                 ZStack {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.blue)
+                    
+                    // The contents of the box: sliding article images & titles
                     if !articles.isEmpty {
                         TabView(selection: $currentIndex) {
                             ForEach(articles.indices, id: \.self) { index in
@@ -63,86 +79,61 @@ struct ContentView: View {
                                     Image(articles[index].imageName)
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(height: 200)
-                                        .cornerRadius(8)
+                                        .frame(height: 120)
                                     
                                     Text(articles[index].title)
                                         .font(.headline)
-                                        .foregroundColor(.purple)
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 16)
+                                        .multilineTextAlignment(.center)
                                 }
                                 .tag(index)
-                                .padding()
                             }
                         }
-                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
-                        .frame(height: 280)
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                         .onReceive(carouselTimer) { _ in
                             withAnimation(.easeInOut) {
                                 currentIndex = (currentIndex + 1) % articles.count
                             }
                         }
+                        .padding(16)
                     } else {
                         Text("No articles available")
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white)
                     }
                 }
-                .padding(.vertical, 20)
+                .frame(width: 300, height: 350)
                 
-                // Buttons for Upcoming Elections and Events
-                HStack(spacing: 20) {
-                    NavigationLink(destination: UpcomingElectionsView()) {
+                Spacer()
+                
+                // MARK: - Two Green Buttons
+                VStack(spacing: 16) {
+                    Button {
+                        // Upcoming Elections action
+                    } label: {
                         Text("Upcoming Elections")
                             .font(.headline)
                             .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.purple)
+                            .frame(maxWidth: .infinity, minHeight: 50)
+                            .background(Color.green)
                             .cornerRadius(8)
                     }
                     
-                    NavigationLink(destination: EventsView()) {
+                    Button {
+                        // Events action
+                    } label: {
                         Text("Events")
                             .font(.headline)
                             .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.purple)
+                            .frame(maxWidth: .infinity, minHeight: 50)
+                            .background(Color.green)
                             .cornerRadius(8)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 20)
-                
-                Spacer()
+                .padding(.horizontal, 32)
+                .padding(.bottom, 40)
             }
-            // Using your off-white background: #FCFBFA (RGB: 252, 251, 250)
-            .background(Color(red: 252/255, green: 251/255, blue: 250/255))
-            .ignoresSafeArea()
         }
-    }
-}
-
-// Dummy view for Upcoming Elections – adjust as needed
-struct UpcomingElectionsView: View {
-    var body: some View {
-        VStack {
-            Text("Upcoming Elections")
-                .font(.title)
-                .padding()
-        }
-        .navigationTitle("Upcoming Elections")
-    }
-}
-
-// Dummy view for Events – adjust as needed
-struct EventsView: View {
-    var body: some View {
-        VStack {
-            Text("Events")
-                .font(.title)
-                .padding()
-        }
-        .navigationTitle("Events")
     }
 }
 
