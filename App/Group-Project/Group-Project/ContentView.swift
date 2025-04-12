@@ -8,7 +8,7 @@ struct ArticleItem: Identifiable {
 }
 
 struct ContentView: View {
-    // Example data for the carousel
+    // Example data for the carousel articles
     private let articles: [ArticleItem] = [
         ArticleItem(title: "Breaking News: SwiftUI Tips", imageName: "news1"),
         ArticleItem(title: "Latest Trends in Tech", imageName: "news2"),
@@ -22,24 +22,28 @@ struct ContentView: View {
     let carouselTimer = Timer.publish(every: 4.5, on: .main, in: .common)
         .autoconnect()
     
+    // American flag colors (RGB values)
+    let redColor = Color(red: 178/255, green: 34/255, blue: 52/255)    // #B22234
+    let blueColor = Color(red: 60/255, green: 59/255, blue: 110/255)     // #3C3B6E
+    let whiteColor = Color.white
+
     var body: some View {
         ZStack {
-            // Background color (#FCFBFA)
-            Color(red: 252/255, green: 251/255, blue: 250/255)
+            // Overall Background: White (flag background)
+            whiteColor
                 .ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
-                
-                // MARK: - Red Top Bar
+                // MARK: - Top Bar (Red)
                 HStack {
-                    // Left icon (tap action optional)
+                    // Left icon (optional tap action)
                     Button {
-                        // e.g., show side menu
+                        // e.g., open side menu
                     } label: {
-                        Image(systemName: "sidebar.left") // Replace with your own icon
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .padding(.leading)
+                        Image("sideicon") // Replace with your side icon asset
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40)
                     }
                     
                     Spacer()
@@ -47,86 +51,83 @@ struct ContentView: View {
                     // App Name in Center
                     Text("PolyWatch")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(whiteColor)
                     
                     Spacer()
                     
-                    // Right icon (search or profile), optional
+                    // Right icon (e.g., search) – optional
                     Button {
                         // e.g., search action
                     } label: {
                         Image(systemName: "magnifyingglass")
                             .font(.title)
-                            .foregroundColor(.white)
-                            .padding(.trailing)
+                            .foregroundColor(whiteColor)
                     }
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
                 .frame(height: 60)
-                .background(Color.red)
+                .background(redColor)
                 
                 Spacer()
                 
-                // MARK: - Blue Box (Carousel)
+                // MARK: - Bigger Blue Carousel Box
                 ZStack {
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.blue)
+                        .fill(blueColor)
                     
-                    // The contents of the box: sliding article images & titles
                     if !articles.isEmpty {
                         TabView(selection: $currentIndex) {
                             ForEach(articles.indices, id: \.self) { index in
-                                VStack(spacing: 8) {
+                                VStack(spacing: 12) {
                                     Image(articles[index].imageName)
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(height: 120)
+                                        .frame(height: 180)
+                                        .cornerRadius(8)
                                     
                                     Text(articles[index].title)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 16)
+                                        .font(.title3)
                                         .multilineTextAlignment(.center)
+                                        .foregroundColor(whiteColor)
+                                        .padding(.horizontal, 16)
                                 }
                                 .tag(index)
                             }
                         }
-                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
                         .onReceive(carouselTimer) { _ in
                             withAnimation(.easeInOut) {
                                 currentIndex = (currentIndex + 1) % articles.count
                             }
                         }
-                        .padding(16)
+                        .padding(24)
                     } else {
                         Text("No articles available")
-                            .foregroundColor(.white)
+                            .foregroundColor(whiteColor)
                     }
                 }
-                .frame(width: 300, height: 350)
+                .frame(width: UIScreen.main.bounds.width * 0.9, height: 400) // Bigger box
                 
                 Spacer()
                 
-                // MARK: - Two Green Buttons
+                // MARK: - Two Buttons (American flag colors)
                 VStack(spacing: 16) {
-                    Button {
-                        // Upcoming Elections action
-                    } label: {
+                    NavigationLink(destination: UpcomingElectionsView()) {
                         Text("Upcoming Elections")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(whiteColor)
                             .frame(maxWidth: .infinity, minHeight: 50)
-                            .background(Color.green)
+                            .background(blueColor)
                             .cornerRadius(8)
                     }
                     
-                    Button {
-                        // Events action
-                    } label: {
+                    NavigationLink(destination: EventsView()) {
                         Text("Events")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(whiteColor)
                             .frame(maxWidth: .infinity, minHeight: 50)
-                            .background(Color.green)
+                            .background(redColor)
                             .cornerRadius(8)
                     }
                 }
@@ -134,6 +135,32 @@ struct ContentView: View {
                 .padding(.bottom, 40)
             }
         }
+    }
+}
+
+//
+// Dummy views for navigation links – replace with your actual views
+//
+
+struct UpcomingElectionsView: View {
+    var body: some View {
+        VStack {
+            Text("Upcoming Elections")
+                .font(.title)
+                .padding()
+        }
+        .navigationTitle("Upcoming Elections")
+    }
+}
+
+struct EventsView: View {
+    var body: some View {
+        VStack {
+            Text("Events")
+                .font(.title)
+                .padding()
+        }
+        .navigationTitle("Events")
     }
 }
 
