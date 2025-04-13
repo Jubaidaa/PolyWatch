@@ -54,6 +54,8 @@ extension View {
 struct SidebarMenuContent: View {
     @EnvironmentObject private var menuState: MenuState
     @State private var selectedItem: String? = nil
+    @State private var showingLocalNews = false
+    @State private var showingBreakingNews = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -116,7 +118,7 @@ struct SidebarMenuContent: View {
                     isSelected: selectedItem == "local"
                 ) {
                     selectedItem = "local"
-                    menuState.isShowing = false
+                    showingLocalNews = true
                 }
                 
                 MenuButton(
@@ -125,7 +127,7 @@ struct SidebarMenuContent: View {
                     isSelected: selectedItem == "breaking"
                 ) {
                     selectedItem = "breaking"
-                    menuState.isShowing = false
+                    showingBreakingNews = true
                 }
             }
             .padding(.vertical, 4)
@@ -155,6 +157,24 @@ struct SidebarMenuContent: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 0)
+        .fullScreenCover(isPresented: $showingLocalNews) {
+            NavigationView {
+                NewsView(isBreakingNews: false)
+                    .navigationBarItems(leading: Button("Close") {
+                        showingLocalNews = false
+                        menuState.isShowing = false
+                    })
+            }
+        }
+        .fullScreenCover(isPresented: $showingBreakingNews) {
+            NavigationView {
+                NewsView(isBreakingNews: true)
+                    .navigationBarItems(leading: Button("Close") {
+                        showingBreakingNews = false
+                        menuState.isShowing = false
+                    })
+            }
+        }
     }
 }
 
