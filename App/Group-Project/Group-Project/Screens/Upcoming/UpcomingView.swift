@@ -1,34 +1,60 @@
 import SwiftUI
 
 struct UpcomingView: View {
-    @StateObject private var viewModel = ElectionsFeedViewModel()
+    @StateObject private var viewModel = ElectionsViewModel()
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         ZStack {
-            // Background
             AppColors.white
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Top Bar
                 TopBarView(
                     onMenuTap: {},
                     onLogoTap: { presentationMode.wrappedValue.dismiss() },
                     onSearchTap: {}
                 )
                 
-                Spacer()
-                
-                // Center Image
-                Image("vote")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: UIScreen.main.bounds.width * 0.85)
-                    .padding(.vertical, Constants.Padding.standard / 2)
-                    .accessibilityLabel("Voting Information")
-                
-                Spacer()
+                if viewModel.isLoading {
+                    Spacer()
+                    ProgressView("Loading elections...")
+                    Spacer()
+                } else if let error = viewModel.error {
+                    Spacer()
+                    VStack(spacing: Constants.Padding.standard) {
+                        Text("😕")
+                            .font(.system(size: 64))
+                        Text(error.description)
+                            .multilineTextAlignment(.center)
+                        Button("Try Again") {
+                            viewModel.fetchElections()
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                    }
+                    .padding()
+                    Spacer()
+                } else if viewModel.elections.isEmpty {
+                    Spacer()
+                    // Center Image
+                    Image("vote")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: UIScreen.main.bounds.width * 0.85)
+                        .padding(.vertical, Constants.Padding.standard / 2)
+                        .accessibilityLabel("Voting Information")
+                    Spacer()
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: Constants.Padding.standard) {
+                            ForEach(viewModel.elections) { election in
+                                ElectionCard(election: election, dateFormatter: viewModel.formatDate)
+                                    .padding(.horizontal)
+                            }
+                        }
+                        .padding(.vertical)
+                    }
+                }
                 
                 // Voter Action Buttons
                 VStack(spacing: Constants.Padding.standard) {
@@ -67,6 +93,41 @@ struct UpcomingView: View {
             }
         }
         .navigationBarHidden(true)
+        .onAppear {
+            viewModel.fetchElections()
+        }
+    }
+}
+
+struct ElectionCard: View {
+    let election: Election
+    let dateFormatter: (String) -> String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(election.name)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+            
+            Text(dateFormatter(election.electionDay))
+                .font(.body)
+                .foregroundColor(.gray)
+            
+            if let stateName = election.stateName {
+                Text(stateName)
+                    .font(.body)
+                    .italic()
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: Constants.Dimensions.cornerRadius)
+                .fill(Color.white)
+                .shadow(radius: 2)
+        )
     }
 }
 

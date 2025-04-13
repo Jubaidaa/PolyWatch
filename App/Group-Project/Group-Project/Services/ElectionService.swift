@@ -1,7 +1,7 @@
 import Foundation
 
 class ElectionService {
-    private let baseURL = "https://www.googleapis.com/civicinfo/v2"
+    private let baseURL = "https://civicinfo.googleapis.com/civicinfo/v2"
     private let apiKey: String
     
     init(apiKey: String) {
@@ -21,18 +21,33 @@ class ElectionService {
             throw ElectionError.invalidURL
         }
         
+        print("Fetching elections from URL: \(url)")
+        
         let (data, response) = try await URLSession.shared.data(from: url)
         
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ElectionError.invalidResponse
+        }
+        
+        print("Response status code: \(httpResponse.statusCode)")
+        
+        if !(200...299).contains(httpResponse.statusCode) {
+            if let errorString = String(data: data, encoding: .utf8) {
+                print("Error response: \(errorString)")
+            }
             throw ElectionError.invalidResponse
         }
         
         do {
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("Received JSON: \(jsonString)")
+            }
+            
             let decoder = JSONDecoder()
             let result = try decoder.decode(ElectionsResponse.self, from: data)
             return result.elections
         } catch {
+            print("Decoding error: \(error)")
             throw ElectionError.invalidData
         }
     }

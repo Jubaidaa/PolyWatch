@@ -9,8 +9,8 @@ class ElectionsViewModel: ObservableObject {
     
     private let service: ElectionService
     
-    init(apiKey: String) {
-        self.service = ElectionService(apiKey: apiKey)
+    init() {
+        self.service = ElectionService(apiKey: "AIzaSyA81H369Zveytnca05k2Mtkr4RfjmGyi9U")
     }
     
     func fetchElections() {
