@@ -27,14 +27,45 @@ enum FeedError: Error {
 }
 
 class RSSAggregator: ObservableObject {
+    @Published var isLoading = false
+    @Published var error: FeedError?
+    
     let feeds = [
         ("https://truthout.org/feed/", "Truthout"),
         ("https://www.thestranger.com/feeds/rss", "The Stranger"),
         ("https://www.truthdig.com/feed/", "Truthdig")
     ]
     
-    @Published private(set) var isLoading = false
-    @Published private(set) var error: FeedError?
+    // Make these methods internal or public so they can be accessed by subclasses
+    func extractTitle(from xmlString: String) -> String? {
+        if let range = xmlString.range(of: "<title>") {
+            let start = range.upperBound
+            if let end = xmlString.range(of: "</title>", range: start..<xmlString.endIndex) {
+                return String(xmlString[start..<end.lowerBound])
+            }
+        }
+        return nil
+    }
+    
+    func extractLink(from xmlString: String) -> String? {
+        if let range = xmlString.range(of: "<link>") {
+            let start = range.upperBound
+            if let end = xmlString.range(of: "</link>", range: start..<xmlString.endIndex) {
+                return String(xmlString[start..<end.lowerBound])
+            }
+        }
+        return nil
+    }
+    
+    func extractDescription(from xmlString: String) -> String? {
+        if let range = xmlString.range(of: "<description>") {
+            let start = range.upperBound
+            if let end = xmlString.range(of: "</description>", range: start..<xmlString.endIndex) {
+                return String(xmlString[start..<end.lowerBound])
+            }
+        }
+        return nil
+    }
     
     func fetchAllArticles(completion: @escaping (Result<[Article], FeedError>) -> Void) {
         isLoading = true
@@ -96,37 +127,6 @@ class RSSAggregator: ObservableObject {
                 completion(.success(sorted))
             }
         }
-    }
-    
-    // Helper methods for basic RSS parsing
-    private func extractTitle(from xmlString: String) -> String? {
-        if let range = xmlString.range(of: "<title>") {
-            let start = range.upperBound
-            if let end = xmlString.range(of: "</title>", range: start..<xmlString.endIndex) {
-                return String(xmlString[start..<end.lowerBound])
-            }
-        }
-        return nil
-    }
-    
-    private func extractLink(from xmlString: String) -> String? {
-        if let range = xmlString.range(of: "<link>") {
-            let start = range.upperBound
-            if let end = xmlString.range(of: "</link>", range: start..<xmlString.endIndex) {
-                return String(xmlString[start..<end.lowerBound])
-            }
-        }
-        return nil
-    }
-    
-    private func extractDescription(from xmlString: String) -> String? {
-        if let range = xmlString.range(of: "<description>") {
-            let start = range.upperBound
-            if let end = xmlString.range(of: "</description>", range: start..<xmlString.endIndex) {
-                return String(xmlString[start..<end.lowerBound])
-            }
-        }
-        return nil
     }
 }
 
