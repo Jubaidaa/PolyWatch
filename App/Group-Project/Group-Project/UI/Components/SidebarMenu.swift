@@ -3,6 +3,10 @@ import SwiftUI
 // Global state object to manage menu visibility
 class MenuState: ObservableObject {
     @Published var isShowing = false
+    @Published var showingCalendar = false
+    @Published var showingVoterRegistration = false
+    @Published var showingLocalNews = false
+    @Published var showingBreakingNews = false
 }
 
 struct GlobalMenuModifier: ViewModifier {
@@ -38,8 +42,32 @@ struct GlobalMenuModifier: ViewModifier {
                 }
                 .zIndex(999)
             }
+            
+            if menuState.showingCalendar {
+                ElectionCalendarView()
+                    .zIndex(1000)
+            }
+            
+            if menuState.showingVoterRegistration {
+                VoterRegistrationView()
+                    .zIndex(1000)
+            }
+            
+            if menuState.showingLocalNews {
+                LocalNewsView()
+                    .zIndex(1000)
+            }
+            
+            if menuState.showingBreakingNews {
+                BreakingNewsView()
+                    .zIndex(1000)
+            }
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: menuState.isShowing)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: menuState.showingCalendar)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: menuState.showingVoterRegistration)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: menuState.showingLocalNews)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: menuState.showingBreakingNews)
         .environmentObject(menuState)
     }
 }
@@ -53,176 +81,117 @@ extension View {
 
 struct SidebarMenuContent: View {
     @EnvironmentObject private var menuState: MenuState
-    @State private var selectedItem: String? = nil
-    @State private var showingLocalNews = false
-    @State private var showingBreakingNews = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(spacing: 0) {
             // Header
             HStack {
-                Text("Menu")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                Text("POLYWATCH")
+                    .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
                 Spacer()
                 Button(action: {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         menuState.isShowing = false
                     }
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.2))
-                            .frame(width: 28, height: 28)
-                        Image(systemName: "xmark")
-                            .foregroundColor(.white)
-                            .font(.system(size: 12, weight: .semibold))
-                    }
+                    Image(systemName: "xmark")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
-            
-            Divider()
-                .frame(height: 1)
-                .background(Color.white.opacity(0.15))
-                .padding(.horizontal, 12)
+            .padding(.top, 16)
+            .padding(.bottom, 12)
             
             // Menu Items
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(spacing: 16) {
                 MenuButton(
-                    title: "Upcoming Events",
-                    icon: "calendar",
-                    isSelected: selectedItem == "events"
-                ) {
-                    selectedItem = "events"
-                    menuState.isShowing = false
-                }
-                
-                MenuButton(
-                    title: "Register to Vote",
-                    icon: "pencil.circle",
-                    isSelected: selectedItem == "register"
-                ) {
-                    selectedItem = "register"
-                    if let url = URL(string: Constants.URLs.registerToVote) {
-                        UIApplication.shared.open(url)
+                    title: "Breaking News",
+                    icon: "bolt",
+                    action: {
+                        withAnimation {
+                            menuState.isShowing = false
+                            menuState.showingBreakingNews = true
+                        }
                     }
-                    menuState.isShowing = false
-                }
+                )
                 
                 MenuButton(
                     title: "Local News",
-                    icon: "newspaper",
-                    isSelected: selectedItem == "local"
-                ) {
-                    selectedItem = "local"
-                    showingLocalNews = true
-                }
+                    icon: "doc.text",
+                    action: {
+                        withAnimation {
+                            menuState.isShowing = false
+                            menuState.showingLocalNews = true
+                        }
+                    }
+                )
                 
                 MenuButton(
-                    title: "Breaking News",
-                    icon: "bolt.fill",
-                    isSelected: selectedItem == "breaking"
-                ) {
-                    selectedItem = "breaking"
-                    showingBreakingNews = true
-                }
-            }
-            .padding(.vertical, 4)
-            
-            // Footer
-            Text("PolyWatch v1.0")
-                .font(.system(size: 12, weight: .regular))
-                .foregroundColor(.white.opacity(0.5))
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-                .padding(.top, 4)
-        }
-        .frame(width: UIScreen.main.bounds.width * 0.75)
-        .frame(maxWidth: 280)
-        .background(
-            ZStack {
-                AppColors.red
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.white.opacity(0.1),
-                        Color.clear
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
+                    title: "Register to Vote",
+                    icon: "checkmark.circle",
+                    action: {
+                        withAnimation {
+                            menuState.isShowing = false
+                            menuState.showingVoterRegistration = true
+                        }
+                    }
+                )
+                
+                MenuButton(
+                    title: "Upcoming Events",
+                    icon: "calendar",
+                    action: {
+                        withAnimation {
+                            menuState.isShowing = false
+                            menuState.showingCalendar = true
+                        }
+                    }
                 )
             }
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 0)
-        .fullScreenCover(isPresented: $showingLocalNews) {
-            NavigationView {
-                NewsView(isBreakingNews: false)
-                    .navigationBarItems(leading: Button("Close") {
-                        showingLocalNews = false
-                        menuState.isShowing = false
-                    })
-            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+            
+            Spacer()
+            
+            // Footer
+            Text("© 2024 POLYWATCH")
+                .font(.system(size: 12))
+                .foregroundColor(.white.opacity(0.7))
+                .padding(.bottom, 16)
         }
-        .fullScreenCover(isPresented: $showingBreakingNews) {
-            NavigationView {
-                NewsView(isBreakingNews: true)
-                    .navigationBarItems(leading: Button("Close") {
-                        showingBreakingNews = false
-                        menuState.isShowing = false
-                    })
-            }
-        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 320)
+        .background(Color(red: 0.85, green: 0.15, blue: 0.15))
+        .cornerRadius(12)
     }
 }
 
 struct MenuButton: View {
     let title: String
     let icon: String
-    let isSelected: Bool
     let action: () -> Void
-    @State private var isPressed = false
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 14) {
-                // Icon container with standard iOS spacing
-                ZStack {
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(Color.white.opacity(isSelected ? 0.2 : 0.1))
-                        .frame(width: 28, height: 28)
-                    
-                    Image(systemName: icon)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(.white)
-                }
-                .padding(.leading, 8)
+            HStack(spacing: 12) {
+                Circle()
+                    .fill(Color.white.opacity(0.2))
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Image(systemName: icon)
+                            .font(.system(size: 14))
+                            .foregroundColor(.white)
+                    )
                 
                 Text(title)
-                    .font(.system(size: 16, weight: .regular))
+                    .font(.system(size: 16))
+                    .foregroundColor(.white)
+                
                 Spacer()
             }
-            .foregroundColor(.white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .frame(height: 44) // Standard iOS list item height
-            .background(
-                Group {
-                    if isSelected {
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(Color.white.opacity(0.1))
-                            .padding(.horizontal, 4)
-                    }
-                }
-            )
-            .scaleEffect(isPressed ? 0.98 : 1)
-            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
-        .onLongPressGesture(minimumDuration: 0.1, maximumDistance: 0, pressing: { pressing in
-            isPressed = pressing
-        }, perform: {})
     }
 } 
