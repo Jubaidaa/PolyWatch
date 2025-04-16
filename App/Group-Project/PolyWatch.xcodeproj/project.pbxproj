@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FCE585D62DAEDD03002489FD /* FeedKit in Frameworks */ = {isa = PBXBuildFile; productRef = FCE585D52DAEDD03002489FD /* FeedKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		094FF3EA2DAA0D6800164DEB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCE585D62DAEDD03002489FD /* FeedKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = PolyWatch;
 			packageProductDependencies = (
+				FCE585D52DAEDD03002489FD /* FeedKit */,
 			);
 			productName = "Group-Project";
 			productReference = 094FF3D92DAA0D6600164DEB /* PolyWatch.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 094FF3D02DAA0D6600164DEB;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FCE585D42DAEDD03002489FD /* XCRemoteSwiftPackageReference "FeedKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 094FF3DA2DAA0D6600164DEB /* Products */;
 			projectDirPath = "";
@@ -552,6 +561,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FCE585D42DAEDD03002489FD /* XCRemoteSwiftPackageReference "FeedKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nmdias/FeedKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FCE585D52DAEDD03002489FD /* FeedKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FCE585D42DAEDD03002489FD /* XCRemoteSwiftPackageReference "FeedKit" */;
+			productName = FeedKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 094FF3D12DAA0D6600164DEB /* Project object */;
 }
