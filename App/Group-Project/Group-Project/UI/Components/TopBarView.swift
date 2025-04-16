@@ -4,7 +4,7 @@ struct TopBarView: View {
     let onMenuTap: () -> Void
     let onLogoTap: () -> Void
     let onSearchTap: () -> Void
-    @State private var showSidebar = false
+    @EnvironmentObject private var menuState: MenuState
     
     var body: some View {
         ZStack {
@@ -13,7 +13,7 @@ struct TopBarView: View {
                 // Menu Button
                 Button(action: {
                     withAnimation {
-                        showSidebar.toggle()
+                        menuState.isShowing = true
                     }
                 }) {
                     Image(systemName: "line.3.horizontal")
@@ -48,15 +48,6 @@ struct TopBarView: View {
             .padding(.vertical, Constants.Padding.vertical)
             .frame(height: Constants.Dimensions.topBarHeight)
             .background(AppColors.TopBar.background)
-        }
-        .overlay {
-            if showSidebar {
-                SidebarMenu(isShowing: $showSidebar, onDismiss: {
-                    withAnimation {
-                        showSidebar = false
-                    }
-                })
-            }
         }
     }
 } 
