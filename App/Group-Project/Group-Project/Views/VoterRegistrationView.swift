@@ -1,15 +1,20 @@
 import SwiftUI
 
 struct VoterRegistrationView: View {
-    @EnvironmentObject private var menuState: MenuState
-    @State private var selectedSection: InfoSection = .registration
+    @Environment(\.dismiss) private var dismiss
+    @State private var showingHelp = false
+    @State private var selectedHelpSection: InfoSection = .rights
     @State private var showingDetailView = false
     @State private var selectedDetail: DetailInfo?
+    @EnvironmentObject private var menuState: MenuState
+    let showHelpDirectly: Bool
+    
+    init(showHelpDirectly: Bool = false) {
+        self.showHelpDirectly = showHelpDirectly
+    }
     
     enum InfoSection: String, CaseIterable {
-        case registration = "Registration"
         case requirements = "Requirements"
-        case deadlines = "Key Dates"
         case rights = "Voter Rights"
         case resources = "Resources"
     }
@@ -22,95 +27,125 @@ struct VoterRegistrationView: View {
     }
     
     var body: some View {
+        VStack(spacing: 0) {
+            if showHelpDirectly {
+                helpView
+            } else {
+                registrationView
+            }
+        }
+        .background(Color.white)
+        .sheet(item: $selectedDetail) { detail in
+            DetailView(detail: detail)
+        }
+    }
+    
+    private var registrationView: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Button(action: { showingHelp = true }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "questionmark.circle.fill")
+                        Text("Help")
+                    }
+                    .foregroundColor(.blue)
+                    .font(.system(size: 17, weight: .semibold))
+                }
+                
+                Spacer()
+                
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
+            
+            Text("Registration")
+                .font(.system(size: 32, weight: .bold))
+                .padding(.top, 20)
+            
+            Text("Placeholder Voter Information")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding(.top, 8)
+                .padding(.bottom, 32)
+            
+            // Registration Content
+            registrationSection
+                .padding(.horizontal, 20)
+            
+            Spacer(minLength: 24)
+        }
+        .sheet(isPresented: $showingHelp) {
+            helpView
+        }
+    }
+    
+    private var helpView: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 8) {
-                        Text("Register to Vote")
-                            .font(.system(size: 34, weight: .bold))
-                        Text("California Voter Information")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+            VStack(spacing: 0) {
+                Picker("Section", selection: $selectedHelpSection) {
+                    ForEach(InfoSection.allCases, id: \.self) { section in
+                        Text(section.rawValue).tag(section)
                     }
-                    .padding(.top)
-                    
-                    // Section Picker
-                    Picker("Section", selection: $selectedSection) {
-                        ForEach(InfoSection.allCases, id: \.self) { section in
-                            Text(section.rawValue).tag(section)
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .padding(.vertical, 12)
+                
+                ScrollView {
+                    Group {
+                        switch selectedHelpSection {
+                        case .requirements:
+                            requirementsSection
+                        case .rights:
+                            rightsSection
+                        case .resources:
+                            resourcesSection
                         }
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal)
-                    
-                    // Content based on selected section
-                    switch selectedSection {
-                    case .registration:
-                        registrationSection
-                    case .requirements:
-                        requirementsSection
-                    case .deadlines:
-                        deadlinesSection
-                    case .rights:
-                        rightsSection
-                    case .resources:
-                        resourcesSection
                     }
                 }
             }
+            .navigationTitle("Help & Information")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button("Close") {
-                    withAnimation {
-                        menuState.showingVoterRegistration = false
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Exit") {
+                        if showHelpDirectly {
+                            withAnimation {
+                                menuState.showingHelp = false
+                                menuState.isShowing = true
+                            }
+                        } else {
+                            showingHelp = false
+                        }
                     }
                 }
-            )
-            .sheet(item: $selectedDetail) { detail in
-                DetailView(detail: detail)
             }
         }
     }
     
     private var registrationSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             InfoCard(
                 title: "Register Online",
-                description: "The fastest and easiest way to register to vote in California. Tap for step-by-step guide.",
+                description: "The fastest and easiest way to register to vote.",
                 action: {
-                    selectedDetail = DetailInfo(
-                        title: "Online Registration Guide",
-                        content: [
-                            "Step 1: Gather Required Information",
-                            "• California driver's license or ID card number",
-                            "• Last 4 digits of Social Security number",
-                            "• Date of birth",
-                            "• Home address and mailing address",
-                            "• Email address (optional but recommended)",
-                            "",
-                            "Step 2: Complete the Form",
-                            "• Visit registertovote.ca.gov",
-                            "• Fill out all required fields",
-                            "• Review your information carefully",
-                            "• Submit your application",
-                            "",
-                            "Step 3: Confirmation",
-                            "• You'll receive a confirmation number",
-                            "• Your county elections office will contact you",
-                            "• Your Voter Notification Card will arrive in 4-6 weeks"
-                        ],
-                        links: [("Register Now", "https://registertovote.ca.gov/")]
-                    )
-                    showingDetailView = true
+                    if let url = URL(string: Constants.URLs.registerToVote) {
+                        UIApplication.shared.open(url)
+                    }
                 },
-                actionText: "View Guide",
-                showsDetailIndicator: true
+                actionText: "Register Now",
+                showsDetailIndicator: false
             )
             
             InfoCard(
                 title: "Register by Mail",
-                description: "Request a paper application or pick one up at your local library, post office, or DMV. Tap for detailed instructions.",
+                description: "Request a paper application or pick one up at your local library, post office, or DMV.",
                 action: {
                     selectedDetail = DetailInfo(
                         title: "Mail Registration Guide",
@@ -146,7 +181,7 @@ struct VoterRegistrationView: View {
             
             InfoCard(
                 title: "Same Day Registration",
-                description: "Register and vote on the same day at any voting location. Tap to learn about the process.",
+                description: "Register and vote on the same day at any voting location.",
                 action: {
                     selectedDetail = DetailInfo(
                         title: "Same Day Registration",
@@ -160,19 +195,7 @@ struct VoterRegistrationView: View {
                             "1. Visit any voting location in your county",
                             "2. Complete voter registration form",
                             "3. Receive a provisional ballot",
-                            "4. Vote and submit your ballot",
-                            "",
-                            "Ballot Counting:",
-                            "• Your ballot will be counted after your registration is verified",
-                            "• Track your ballot status online",
-                            "",
-                            "Acceptable ID Forms:",
-                            "• CA driver's license/ID",
-                            "• Passport",
-                            "• Employee ID",
-                            "• Student ID",
-                            "• Military ID",
-                            "• Tribal ID"
+                            "4. Vote and submit your ballot"
                         ],
                         links: [("Find Voting Location", "https://www.sos.ca.gov/elections/polling-place")]
                     )
@@ -181,56 +204,18 @@ struct VoterRegistrationView: View {
                 actionText: "Learn More",
                 showsDetailIndicator: true
             )
-            
-            InfoCard(
-                title: "Check Registration Status",
-                description: "View your current registration status, polling place, and ballot information. Tap for detailed voter information.",
-                action: {
-                    selectedDetail = DetailInfo(
-                        title: "Voter Information",
-                        content: [
-                            "What You Can Check:",
-                            "• Registration status",
-                            "• Party preference",
-                            "• Voting precinct",
-                            "• Polling place location",
-                            "• Sample ballot availability",
-                            "• Vote-by-mail status",
-                            "",
-                            "How to Update Information:",
-                            "1. Re-register if you:",
-                            "   • Move to a new address",
-                            "   • Change your name",
-                            "   • Want to change party preference",
-                            "",
-                            "Additional Features:",
-                            "• View upcoming elections",
-                            "• Check ballot status",
-                            "• Find drop box locations",
-                            "• Sign up for ballot tracking"
-                        ],
-                        links: [
-                            ("Check Status", "https://voterstatus.sos.ca.gov/"),
-                            ("Track Ballot", "https://california.ballottrax.net/voter/")
-                        ]
-                    )
-                    showingDetailView = true
-                },
-                actionText: "Check Now",
-                showsDetailIndicator: true
-            )
         }
-        .padding()
     }
     
     private var requirementsSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 24) {
             InfoCard(
                 title: "Basic Requirements",
                 description: "To register to vote in California, you must be:\n• A United States citizen\n• A resident of California\n• 18 years or older on Election Day\n• Not currently serving a state or federal prison term for a felony conviction\n• Not currently found mentally incompetent by a court",
                 action: nil,
                 actionText: nil
             )
+            .padding(.bottom, 4)
             
             InfoCard(
                 title: "Pre-Registration for Youth",
@@ -244,32 +229,6 @@ struct VoterRegistrationView: View {
             )
             
             InfoCard(
-                title: "ID Requirements",
-                description: "First-time voters who registered online or by mail may need to show ID when voting. Acceptable forms include:\n• CA driver's license\n• Passport\n• Student ID\n• Military ID\n• Utility bill\n• Bank statement",
-                action: nil,
-                actionText: nil
-            )
-        }
-        .padding()
-    }
-    
-    private var deadlinesSection: some View {
-        VStack(spacing: 16) {
-            InfoCard(
-                title: "Registration Deadlines",
-                description: "• Regular registration: 15 days before Election Day\n• Same-day registration: Available through Election Day\n• Mail ballot request: 7 days before Election Day\n• Mail ballot return: Postmarked by Election Day and received within 7 days",
-                action: nil,
-                actionText: nil
-            )
-            
-            InfoCard(
-                title: "2024 Election Calendar",
-                description: "Primary Election:\n• Election Day: March 5, 2024\n• Registration Deadline: February 20, 2024\n\nGeneral Election:\n• Election Day: November 5, 2024\n• Registration Deadline: October 21, 2024",
-                action: nil,
-                actionText: nil
-            )
-            
-            InfoCard(
                 title: "Early Voting",
                 description: "Early voting locations open 10 days before Election Day. Some counties offer even earlier voting options.",
                 action: {
@@ -279,8 +238,16 @@ struct VoterRegistrationView: View {
                 },
                 actionText: "Find Early Voting"
             )
+            
+            InfoCard(
+                title: "ID Requirements",
+                description: "First-time voters who registered online or by mail may need to show ID when voting. Acceptable forms include:\n• CA driver's license\n• Passport\n• Student ID\n• Military ID\n• Utility bill\n• Bank statement",
+                action: nil,
+                actionText: nil
+            )
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.vertical, 12)
     }
     
     private var rightsSection: some View {
@@ -332,7 +299,7 @@ struct VoterRegistrationView: View {
             
             InfoCard(
                 title: "Track Your Ballot",
-                description: "Sign up for automatic updates about your ballot's status via email, text, or voice call.",
+                description: "Sign up for automatic updates about your ballot's status.",
                 action: {
                     if let url = URL(string: "https://california.ballottrax.net/voter/") {
                         UIApplication.shared.open(url)
@@ -343,7 +310,7 @@ struct VoterRegistrationView: View {
             
             InfoCard(
                 title: "County Elections Offices",
-                description: "Contact your local elections office for specific questions about voting in your county.",
+                description: "Contact your local elections office for specific questions.",
                 action: {
                     if let url = URL(string: "https://www.sos.ca.gov/elections/voting-resources/county-elections-offices") {
                         UIApplication.shared.open(url)
@@ -354,14 +321,14 @@ struct VoterRegistrationView: View {
             
             InfoCard(
                 title: "Report Issues",
-                description: "Report voting problems or voter intimidation:\n• Voter Hotline: (800) 345-VOTE (8683)\n• Election cybersecurity issues: VoteSure@sos.ca.gov",
+                description: "Report voting problems or voter intimidation:\n• Voter Hotline: (800) 345-VOTE (8683)",
                 action: nil,
                 actionText: nil
             )
             
             InfoCard(
                 title: "Additional Resources",
-                description: "• League of Women Voters\n• California Secretary of State\n• County Registrar of Voters\n• National Voter Registration Application",
+                description: "• League of Women Voters\n• California Secretary of State\n• County Registrar of Voters",
                 action: {
                     if let url = URL(string: "https://www.sos.ca.gov/elections/voting-resources/") {
                         UIApplication.shared.open(url)
@@ -370,7 +337,8 @@ struct VoterRegistrationView: View {
                 actionText: "More Resources"
             )
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.vertical, 12)
     }
 }
 
@@ -482,5 +450,4 @@ struct InfoCard: View {
 
 #Preview {
     VoterRegistrationView()
-        .environmentObject(MenuState())
 } 

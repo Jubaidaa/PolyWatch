@@ -3,6 +3,7 @@ import SwiftUI
 struct UpcomingView: View {
     @StateObject private var viewModel = ElectionsViewModel()
     @Environment(\.presentationMode) var presentationMode
+    @State private var showVoterRegistration = false
     
     var body: some View {
         ZStack {
@@ -59,9 +60,7 @@ struct UpcomingView: View {
                 // Voter Action Buttons
                 VStack(spacing: Constants.Padding.standard) {
                     Button(action: {
-                        if let url = URL(string: Constants.URLs.registerToVote) {
-                            UIApplication.shared.open(url)
-                        }
+                        showVoterRegistration = true
                     }) {
                         HStack {
                             Image(systemName: "pencil.circle.fill")
@@ -71,7 +70,7 @@ struct UpcomingView: View {
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
-                    .accessibilityHint("Opens voter registration website")
+                    .accessibilityHint("Opens voter registration view")
                     
                     Button(action: {
                         if let url = URL(string: Constants.URLs.checkVoterStatus) {
@@ -93,6 +92,9 @@ struct UpcomingView: View {
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showVoterRegistration) {
+            VoterRegistrationView()
+        }
         .onAppear {
             viewModel.fetchElections()
         }

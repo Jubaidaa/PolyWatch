@@ -286,116 +286,20 @@ extension ElectionCalendarViewModel: CLLocationManagerDelegate {
 }
 
 struct ElectionCalendarView: View {
-    @StateObject private var viewModel = ElectionCalendarViewModel()
     @EnvironmentObject private var menuState: MenuState
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Location and calendar header
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(viewModel.userLocation)
-                            .font(.headline)
-                            .foregroundColor(.red)
-                        if let error = viewModel.locationError {
-                            Text(error)
-                                .font(.caption)
-                                .foregroundColor(.red)
+            Text("Election Calendar Coming Soon")
+                .navigationTitle("Election Calendar")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Exit") {
+                            menuState.showingCalendar = false
                         }
                     }
-                    Spacer()
                 }
-                .padding()
-                
-                // Month navigation
-                HStack {
-                    Button(action: {
-                        withAnimation {
-                            viewModel.moveMonth(by: -1)
-                        }
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .font(.title3)
-                            .foregroundColor(.red)
-                    }
-                    
-                    Text(viewModel.selectedDate.formatted(.dateTime.month(.wide).year()))
-                        .font(.title2.bold())
-                        .frame(maxWidth: .infinity)
-                    
-                    Button(action: {
-                        withAnimation {
-                            viewModel.moveMonth(by: 1)
-                        }
-                    }) {
-                        Image(systemName: "chevron.right")
-                            .font(.title3)
-                            .foregroundColor(.red)
-                    }
-                }
-                .padding(.horizontal)
-                
-                // Today button
-                Button(action: {
-                    withAnimation {
-                        viewModel.selectedDate = Date()
-                    }
-                }) {
-                    Text("Today")
-                        .font(.subheadline.bold())
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Color.red)
-                        .cornerRadius(8)
-                }
-                .padding(.bottom)
-                
-                // Calendar grid
-                CalendarGrid(selectedDate: $viewModel.selectedDate, events: viewModel.filteredEvents, userLocation: viewModel.userLocation)
-                
-                // Events list
-                VStack(alignment: .leading, spacing: 12) {
-                    if !viewModel.filteredEvents.isEmpty {
-                        Text("Elections This Month")
-                            .font(.headline)
-                            .padding(.horizontal)
-                            .padding(.top)
-                        
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 12) {
-                                ForEach(viewModel.filteredEvents) { event in
-                                    ElectionEventCard(event: event, userLocation: viewModel.userLocation)
-                                }
-                            }
-                            .padding()
-                        }
-                    } else {
-                        VStack(spacing: 8) {
-                            Image(systemName: "calendar.badge.exclamationmark")
-                                .font(.largeTitle)
-                                .foregroundColor(.gray)
-                            Text("No Elections This Month")
-                                .font(.headline)
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                    }
-                }
-                .background(Color.gray.opacity(0.05))
-                .cornerRadius(12)
-                .padding()
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button("Close") {
-                    withAnimation {
-                        menuState.showingCalendar = false
-                    }
-                }
-            )
         }
     }
 }
