@@ -28,17 +28,6 @@ struct SidebarMenuContent: View {
             // Menu Items
             VStack(spacing: 16) {
                 MenuButton(
-                    title: "Events",
-                    icon: "calendar.badge.clock",
-                    action: {
-                        withAnimation {
-                            menuState.isShowing = false
-                            menuState.showingEvents = true
-                        }
-                    }
-                )
-                
-                MenuButton(
                     title: "Breaking News",
                     icon: "bolt",
                     action: {
@@ -61,12 +50,12 @@ struct SidebarMenuContent: View {
                 )
                 
                 MenuButton(
-                    title: "Get Help",
-                    icon: "questionmark.circle",
+                    title: "Events",
+                    icon: "calendar.badge.clock",
                     action: {
                         withAnimation {
                             menuState.isShowing = false
-                            menuState.showingHelp = true
+                            menuState.showingEvents = true
                         }
                     }
                 )
@@ -78,6 +67,17 @@ struct SidebarMenuContent: View {
                         withAnimation {
                             menuState.isShowing = false
                             menuState.showingCalendar = true
+                        }
+                    }
+                )
+                
+                MenuButton(
+                    title: "Get Help",
+                    icon: "questionmark.circle",
+                    action: {
+                        withAnimation {
+                            menuState.isShowing = false
+                            menuState.showingHelp = true
                         }
                     }
                 )
