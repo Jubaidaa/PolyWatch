@@ -94,7 +94,7 @@ struct ContentView: View {
                                 .cornerRadius(8)
                         }
                         
-                        NavigationLink(destination: EventsView()) {
+                        NavigationLink(destination: EventsView(isModal: false)) {
                             Text("Events")
                                 .font(.headline)
                                 .foregroundColor(whiteColor)
@@ -109,38 +109,6 @@ struct ContentView: View {
             }
         }
         .withGlobalMenu()
-    }
-}
-
-//
-// Dummy views for navigation links – replace with your actual views
-//
-
-struct EventsView: View {
-    @Environment(\.presentationMode) var presentationMode
-    
-    var body: some View {
-        ZStack {
-            AppColors.white
-                .ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                TopBarView(
-                    onMenuTap: {},
-                    onLogoTap: { presentationMode.wrappedValue.dismiss() },
-                    onSearchTap: {}
-                )
-                
-                Spacer()
-                
-                Text("Events")
-                    .font(.title)
-                    .padding()
-                
-                Spacer()
-            }
-        }
-        .navigationBarHidden(true)
     }
 }
 

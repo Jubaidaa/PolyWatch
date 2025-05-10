@@ -42,7 +42,7 @@ struct HomeView: View {
                         }
                         .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.secondary))
                         
-                        NavigationLink(destination: EventsListView()) {
+                        NavigationLink(destination: EventsView(isModal: false)) {
                             HStack {
                                 Image(systemName: "star.fill")
                                     .font(.title2)

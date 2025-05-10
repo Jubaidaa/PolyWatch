@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct MainView: View {
+    @StateObject private var menuState = MenuState()
+    
     var body: some View {
         TabView {
             HomeView()
@@ -8,16 +10,16 @@ struct MainView: View {
                     Label("Home", systemImage: "house.fill")
                 }
             
-            EventsListView()
+            EventsView(isModal: false)
                 .tabItem {
                     Label("Events", systemImage: "star.fill")
                 }
         }
+        .tabViewStyle(.page)
+        .environmentObject(menuState)
     }
 }
 
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView()
-    }
+#Preview {
+    MainView()
 } 
