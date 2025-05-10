@@ -10,7 +10,7 @@ struct MainView: View {
                     Label("Home", systemImage: "house.fill")
                 }
             
-            EventsView()
+            EventsView(isModal: false)
                 .tabItem {
                     Label("Events", systemImage: "star.fill")
                 }

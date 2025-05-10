@@ -94,7 +94,7 @@ struct ContentView: View {
                                 .cornerRadius(8)
                         }
                         
-                        NavigationLink(destination: EventsView()) {
+                        NavigationLink(destination: EventsView(isModal: false)) {
                             Text("Events")
                                 .font(.headline)
                                 .foregroundColor(whiteColor)

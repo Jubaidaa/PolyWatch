@@ -64,7 +64,9 @@ struct UpcomingView: View {
                     if selectedView == .list {
                         ScrollView {
                             LazyVStack(spacing: Constants.Padding.standard) {
-                                ForEach(viewModel.elections) { election in
+                                ForEach(viewModel.elections.sorted { election1, election2 in
+                                    election1.electionDay < election2.electionDay
+                                }) { election in
                                     ElectionCard(election: election, dateFormatter: viewModel.formatDate)
                                         .padding(.horizontal)
                                 }
