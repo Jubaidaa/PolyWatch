@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct Group_ProjectApp: App {
+    @StateObject private var stateManager = StateManager()
+    @StateObject private var menuState = MenuState()
+    
     var body: some Scene {
         WindowGroup {
-            SplashScreenView()
+            ContentView()
+                .environmentObject(stateManager)
+                .environmentObject(menuState)
         }
     }
 }

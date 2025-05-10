@@ -81,14 +81,17 @@ extension View {
 
 struct SidebarMenuContent: View {
     @EnvironmentObject private var menuState: MenuState
+    let onLogoTap: () -> Void
     
     var body: some View {
         VStack(spacing: 0) {
             // Header
             HStack {
-                Text("POLYWATCH")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white)
+                Button(action: onLogoTap) {
+                    Text("POLYWATCH")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                }
                 Spacer()
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {

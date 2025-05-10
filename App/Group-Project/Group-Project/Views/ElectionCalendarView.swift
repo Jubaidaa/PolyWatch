@@ -288,9 +288,12 @@ extension ElectionCalendarViewModel: CLLocationManagerDelegate {
 struct ElectionCalendarView: View {
     @StateObject private var viewModel = ElectionCalendarViewModel()
     @EnvironmentObject private var menuState: MenuState
+    @StateObject private var viewModel = ElectionCalendarViewModel()
+    let onLogoTap: () -> Void
     
     var body: some View {
         NavigationView {
+<<<<<<< Updated upstream
             VStack(spacing: 0) {
                 // Location and calendar header
                 HStack {
@@ -303,9 +306,32 @@ struct ElectionCalendarView: View {
                                 .font(.caption)
                                 .foregroundColor(.red)
                         }
+=======
+            ZStack(alignment: .leading) {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+                VStack(spacing: 0) {
+                    TopBarView(
+                        onMenuTap: {
+                            withAnimation {
+                                menuState.isShowing = true
+                            }
+                        },
+                        onLogoTap: onLogoTap,
+                        onSearchTap: {}
+                    )
+                    // Main Calendar Content
+                    VStack(spacing: 0) {
+                        // Place your actual calendar UI here
+                        // For example:
+                        // CalendarHeader(viewModel: viewModel)
+                        // CalendarGrid(selectedDate: $viewModel.selectedDate, events: viewModel.filteredEvents, userLocation: viewModel.userLocation)
+                        // ...
+>>>>>>> Stashed changes
                     }
                     Spacer()
                 }
+<<<<<<< Updated upstream
                 .padding()
                 
                 // Month navigation
@@ -396,6 +422,31 @@ struct ElectionCalendarView: View {
                     }
                 }
             )
+=======
+                if menuState.isShowing {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation {
+                                menuState.isShowing = false
+                            }
+                        }
+                        .zIndex(1)
+                }
+                if menuState.isShowing {
+                    VStack {
+                        SidebarMenuContent(onLogoTap: onLogoTap)
+                            .environmentObject(menuState)
+                            .frame(maxWidth: 320)
+                            .padding(.top, 60)
+                        Spacer()
+                    }
+                    .transition(.move(edge: .leading))
+                    .zIndex(2)
+                }
+            }
+            .navigationBarHidden(true)
+>>>>>>> Stashed changes
         }
     }
 }
@@ -746,5 +797,5 @@ struct CaliforniaCities {
 }
 
 #Preview {
-    ElectionCalendarView()
+    ElectionCalendarView(onLogoTap: {})
 } 

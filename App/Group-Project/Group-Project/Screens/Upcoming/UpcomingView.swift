@@ -2,7 +2,27 @@ import SwiftUI
 
 struct UpcomingView: View {
     @StateObject private var viewModel = ElectionsViewModel()
+    @StateObject private var stateManager = StateManager()
     @Environment(\.presentationMode) var presentationMode
+<<<<<<< Updated upstream
+=======
+    @State private var showVoterRegistration = false
+    @State private var selectedView: ViewType = .list
+    @EnvironmentObject private var menuState: MenuState
+    let onLogoTap: () -> Void
+    
+    enum ViewType {
+        case list
+        case calendar
+    }
+>>>>>>> Stashed changes
+    
+    var filteredElections: [Election] {
+        guard let selectedState = stateManager.selectedState else {
+            return viewModel.elections
+        }
+        return viewModel.elections.filter { $0.stateName == selectedState }
+    }
     
     var body: some View {
         ZStack {
@@ -11,8 +31,12 @@ struct UpcomingView: View {
             
             VStack(spacing: 0) {
                 TopBarView(
-                    onMenuTap: {},
-                    onLogoTap: { presentationMode.wrappedValue.dismiss() },
+                    onMenuTap: {
+                        withAnimation {
+                            menuState.isShowing = true
+                        }
+                    },
+                    onLogoTap: onLogoTap,
                     onSearchTap: {}
                 )
                 
@@ -45,14 +69,31 @@ struct UpcomingView: View {
                         .accessibilityLabel("Voting Information")
                     Spacer()
                 } else {
+<<<<<<< Updated upstream
                     ScrollView {
                         LazyVStack(spacing: Constants.Padding.standard) {
                             ForEach(viewModel.elections) { election in
                                 ElectionCard(election: election, dateFormatter: viewModel.formatDate)
                                     .padding(.horizontal)
+=======
+                    if selectedView == .list {
+                        ScrollView {
+                            LazyVStack(spacing: Constants.Padding.standard) {
+                                ForEach(filteredElections.sorted { election1, election2 in
+                                    election1.electionDay < election2.electionDay
+                                }) { election in
+                                    ElectionCard(election: election, dateFormatter: viewModel.formatDate)
+                                        .padding(.horizontal)
+                                }
+>>>>>>> Stashed changes
                             }
                         }
+<<<<<<< Updated upstream
                         .padding(.vertical)
+=======
+                    } else {
+                        CalendarView(elections: filteredElections, dateFormatter: viewModel.formatDate)
+>>>>>>> Stashed changes
                     }
                 }
                 
@@ -133,6 +174,6 @@ struct ElectionCard: View {
 
 struct UpcomingView_Previews: PreviewProvider {
     static var previews: some View {
-        UpcomingView()
+        UpcomingView(onLogoTap: {})
     }
 } 
