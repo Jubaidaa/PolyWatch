@@ -518,11 +518,7 @@ struct ElectionCalendarView: View {
                         onMenuTap: { withAnimation { menuState.isShowing = true } },
                         onLogoTap: {
                             withAnimation {
-                                menuState.closeAllOverlays()
-                                #if DEBUG
-                                print("🏠 ElectionCalendarView: PolyWatch button tapped - returning to home screen")
-                                print("   menuState ID: \(menuState.id)")
-                                #endif
+                                menuState.returnToMainView()
                             }
                         },
                         onSearchTap: {}

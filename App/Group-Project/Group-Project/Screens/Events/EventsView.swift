@@ -24,27 +24,9 @@ struct EventsView: View {
                 TopBarView(
                     onMenuTap: { withAnimation { menuState.isShowing = true } },
                     onLogoTap: {
-                        // Use a robust approach to ensure navigation works
-                        // First clear view-specific state
-                        withAnimation(.easeInOut(duration: 0.1)) {
-                            self.selectedFilter = .all
-                            self.searchText = ""
-                            self.showingEventDetail = false
-                            #if DEBUG
-                            print("🏠 EventsView: PolyWatch button tapped - clearing view state")
-                            print("   menuState ID: \(menuState.id)")
-                            #endif
-                        }
-                        
-                        // Small delay to ensure state changes are processed
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                            // Then close all overlays
-                            withAnimation {
-                                menuState.closeAllOverlays()
-                                #if DEBUG
-                                print("🏠 EventsView: PolyWatch button tapped - returning to home screen")
-                                #endif
-                            }
+                        // Simply use the new returnToMainView function
+                        withAnimation {
+                            menuState.returnToMainView()
                         }
                     },
                     onSearchTap: {}

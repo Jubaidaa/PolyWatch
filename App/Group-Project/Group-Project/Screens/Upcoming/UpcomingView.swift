@@ -31,7 +31,11 @@ struct UpcomingView: View {
                     onMenuTap: {
                         withAnimation { menuState.isShowing = true }
                     },
-                    onLogoTap: onLogoTap,
+                    onLogoTap: {
+                        withAnimation {
+                            menuState.returnToMainView()
+                        }
+                    },
                     onSearchTap: {}
                 )
                 
