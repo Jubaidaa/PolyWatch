@@ -6,4 +6,6 @@ struct ArticleItem: Identifiable {
     let image: String
     let date: String
     let source: String
+    let description: String
+    let link: URL?
 } 

@@ -139,15 +139,13 @@ class RSSService: ObservableObject {
                     // Get content from description first
                     var description = ""
                     
-                    // Try to get content using JSON dictionary access which is more reliable
-                    if let itemDict = item as? [String: Any] {
-                        if let contentHtml = itemDict["content_html"] as? String {
-                            description = contentHtml
-                        } else if let contentText = itemDict["content_text"] as? String {
-                            description = contentText
-                        } else {
-                            description = "No description available"
-                        }
+                    // Access JSON feed item properties directly
+                    if let contentHtml = item.contentHtml {
+                        description = contentHtml
+                    } else if let contentText = item.contentText {
+                        description = contentText
+                    } else {
+                        description = "No description available"
                     }
                     
                     let rssItem = RSSItem(

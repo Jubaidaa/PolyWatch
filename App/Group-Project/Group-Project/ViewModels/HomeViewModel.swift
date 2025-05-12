@@ -44,7 +44,9 @@ class HomeViewModel: ObservableObject {
                 title: item.title,
                 image: item.imageUrl?.absoluteString ?? "news1", // Fallback to default image
                 date: formatDate(item.pubDate),
-                source: item.source
+                source: item.source,
+                description: item.description,
+                link: item.link
             )
         }
     }
