@@ -5,73 +5,151 @@ import SwiftUI
 
 struct EventsView: View {
     @StateObject private var viewModel = EventsViewModel()
+    @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject var menuState: MenuState
-
+    
+    // Whether this view is shown modally or in a navigation stack
     let isModal: Bool
-    let onLogoTap: () -> Void
-
+    
+    // State for the view
     @State private var searchText = ""
     @State private var selectedFilter: EventFilter = .all
     @State private var showingEventDetail = false
     @State private var selectedEvent: Event?
-
+    
     var body: some View {
-        ZStack {
-            Color.white
-                .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                TopBarView(
-                    onMenuTap: { withAnimation { menuState.isShowing = true } },
-                    onLogoTap: {
-                        // Simply use the new returnToMainView function
-                        withAnimation {
-                            menuState.returnToMainView()
+        NavigationView {
+            ZStack {
+                Color.white
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Custom Top Bar
+                    HStack {
+                        // Menu Button
+                        Button(action: {
+                            withAnimation {
+                                menuState.isShowing = true
+                            }
+                        }) {
+                            Image(systemName: "line.3.horizontal")
+                                .font(.system(size: Constants.Dimensions.iconSize))
+                                .foregroundColor(AppColors.TopBar.icons)
+                                .accessibilityLabel("Menu")
                         }
-                    },
-                    onSearchTap: {}
-                )
-
-                searchBar
-                filterBar
-                content
-            }
-        }
-        .navigationBarHidden(true)
-        .navigationTitle("Events")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if isModal {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Exit") {
-                        menuState.showingEvents = false
+                        
+                        Spacer()
+                        
+                        // Center logo
+                        Button(action: {
+                            // Use the most direct approach to return to main menu
+                            withAnimation {
+                                // First dismiss any modals if presented
+                                if isModal {
+                                    menuState.showingEvents = false
+                                }
+                                
+                                // Then close all overlays
+                                menuState.closeAllOverlays()
+                                
+                                // Then trigger return to main view notification
+                                NotificationCenter.default.post(
+                                    name: Notification.Name("returnToMainView"), 
+                                    object: nil
+                                )
+                            }
+                        }) {
+                            Image("sideicon")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: UIScreen.main.bounds.width * 0.6, height: Constants.Dimensions.topBarHeight)
+                                .foregroundColor(AppColors.white)
+                                .accessibilityLabel("Home")
+                        }
+                        
+                        Spacer()
+                        
+                        // Search icon
+                        Button(action: {}) {
+                            Image(systemName: "magnifyingglass")
+                                .font(.system(size: Constants.Dimensions.iconSize))
+                                .foregroundColor(AppColors.TopBar.icons)
+                                .accessibilityLabel("Search")
+                        }
                     }
-                    .foregroundColor(AppColors.blue)
+                    .padding(.horizontal, Constants.Padding.standard)
+                    .padding(.vertical, Constants.Padding.vertical)
+                    .frame(height: Constants.Dimensions.topBarHeight)
+                    .background(AppColors.TopBar.background)
+                    
+                    // Search and filter bar
+                    searchBar
+                    filterBar
+                    
+                    // Main content
+                    content
+                }
+                
+                // Sidebar and overlay handling
+                if menuState.isShowing {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture { 
+                            withAnimation { 
+                                menuState.isShowing = false 
+                            } 
+                        }
+                        .zIndex(1)
+                    
+                    VStack {
+                        SidebarMenuContent(onLogoTap: {
+                            withAnimation {
+                                menuState.closeAllOverlays()
+                                NotificationCenter.default.post(
+                                    name: Notification.Name("returnToMainView"), 
+                                    object: nil
+                                )
+                            }
+                        })
+                        .environmentObject(menuState)
+                        .frame(maxWidth: 320)
+                        .padding(.top, 60)
+                        Spacer()
+                    }
+                    .transition(.move(edge: .leading))
+                    .zIndex(2)
+                }
+            }
+            .navigationBarHidden(true)
+            .sheet(isPresented: $showingEventDetail) {
+                if let event = selectedEvent {
+                    EventDetailView(event: event)
+                }
+            }
+            .alert("Error", isPresented: Binding(
+                get: { viewModel.error != nil },
+                set: { if !$0 { viewModel.error = nil } }
+            )) {
+                Button("OK", role: .cancel) { viewModel.error = nil }
+            } message: {
+                Text(viewModel.error?.localizedDescription ?? "An unknown error occurred")
+            }
+            .onAppear {
+                Task {
+                    await viewModel.loadEvents()
+                }
+            }
+            // Use the notification system for consistent navigation
+            .onReceive(NotificationCenter.default.publisher(for: Notification.Name("returnToMainView"))) { _ in
+                if isModal {
+                    menuState.showingEvents = false
                 }
             }
         }
-        .sheet(isPresented: $showingEventDetail) {
-            if let event = selectedEvent {
-                EventDetailView(event: event)
-            }
-        }
-        .alert("Error", isPresented: Binding(
-            get: { viewModel.error != nil },
-            set: { if !$0 { viewModel.error = nil } }
-        )) {
-            Button("OK", role: .cancel) { viewModel.error = nil }
-        } message: {
-            Text(viewModel.error?.localizedDescription ?? "An unknown error occurred")
-        }
-        .onAppear {
-            Task {
-                await viewModel.loadEvents()
-            }
-        }
     }
-
+    
     // MARK: – Subviews
-
+    
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -83,7 +161,7 @@ struct EventsView: View {
         .cornerRadius(8)
         .padding(.horizontal)
     }
-
+    
     private var filterBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -99,7 +177,7 @@ struct EventsView: View {
             .padding(.horizontal)
         }
     }
-
+    
     @ViewBuilder
     private var content: some View {
         if viewModel.isLoading && viewModel.events.isEmpty {
@@ -147,9 +225,9 @@ struct EventsView: View {
             }
         }
     }
-
+    
     // MARK: – Helpers
-
+    
     private var filteredEvents: [Event] {
         viewModel
             .getFilteredEvents(filter: selectedFilter)
@@ -160,7 +238,7 @@ struct EventsView: View {
                 event.description.localizedCaseInsensitiveContains(searchText)
             }
     }
-
+    
     /// Renders when `viewModel.error` is non-nil.
     private func errorView(_ error: Error) -> some View {
         VStack(spacing: 16) {
@@ -195,7 +273,7 @@ private struct FilterButton: View {
     let filter: EventFilter
     let isSelected: Bool
     let action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
             Text(filter.title)
@@ -209,9 +287,64 @@ private struct FilterButton: View {
     }
 }
 
+// For event card preview
+struct EventCard: View {
+    let event: Event
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Title
+            Text(event.title)
+                .font(.headline)
+                .lineLimit(2)
+            
+            // Date
+            HStack {
+                Image(systemName: "calendar")
+                    .foregroundColor(.blue)
+                Text(event.shortFormattedDate)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+            
+            // Location
+            HStack {
+                Image(systemName: "mappin.and.ellipse")
+                    .foregroundColor(.red)
+                Text(event.location)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .lineLimit(1)
+            }
+            
+            // Tags
+            if !event.tags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(event.tags.prefix(3), id: \.self) { tag in
+                            Text(tag)
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.blue.opacity(0.1))
+                                .foregroundColor(.blue)
+                                .cornerRadius(4)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white)
+        .cornerRadius(8)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+    }
+}
+
 struct EventsView_Previews: PreviewProvider {
     static var previews: some View {
-        EventsView(isModal: false, onLogoTap: {})
+        EventsView(isModal: false)
             .environmentObject(MenuState())
     }
 }

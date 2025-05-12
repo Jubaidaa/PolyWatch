@@ -76,6 +76,14 @@ struct GlobalMenuModifier: ViewModifier {
             }
             
             if menuState.showingHelp {
+                Group {
+                    #if DEBUG
+                    let _ = print("🔍 GlobalMenuModifier: Presenting HelpView")
+                    let _ = print("   menuState ID: \(menuState.id)")
+                    let _ = print("   showingHelp: \(menuState.showingHelp)")
+                    #endif
+                }
+                
                 HelpView()
                     .environmentObject(menuState)
                     .zIndex(1000)
