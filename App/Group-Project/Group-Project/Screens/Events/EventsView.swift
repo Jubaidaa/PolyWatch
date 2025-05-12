@@ -85,6 +85,7 @@ struct EventsView: View {
                 }
             }
             .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
             .sheet(isPresented: $showingEventDetail) {
                 if let event = selectedEvent {
                     EventDetailView(event: event)
