@@ -113,6 +113,7 @@ struct ContentView: View {
                                     )
                                 }
 
+                                NavigationLink(destination: EventsView(isModal: false)) {
                                 NavigationLink(destination: EventsView(isModal: false, onLogoTap: {
                                     withAnimation {
                                         rootMenuState.closeAllOverlays()
