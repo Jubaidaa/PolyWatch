@@ -5,6 +5,7 @@ struct VoterRegistrationView: View {
     @State private var selectedSection: InfoSection = .registration
     @State private var showingDetailView = false
     @State private var selectedDetail: DetailInfo?
+    @State private var showingHelpView = false
     
     enum InfoSection: String, CaseIterable {
         case registration = "Register"
@@ -54,17 +55,7 @@ struct VoterRegistrationView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        withAnimation {
-                            // First dismiss this view
-                            menuState.showingVoterRegistration = false
-                            
-                            // Then show the help view
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                withAnimation {
-                                    menuState.showingHelp = true
-                                }
-                            }
-                        }
+                        showingHelpView = true
                     } label: {
                         Image(systemName: "questionmark.circle")
                             .font(.system(size: 22))
@@ -74,6 +65,10 @@ struct VoterRegistrationView: View {
             }
             .sheet(item: $selectedDetail) { detail in
                 DetailView(detail: detail)
+            }
+            .fullScreenCover(isPresented: $showingHelpView) {
+                HelpView()
+                    .environmentObject(menuState)
             }
         }
     }
