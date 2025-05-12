@@ -566,10 +566,6 @@ struct ElectionCalendarView: View {
                     // Events list for selected date
                     ScrollView {
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Events on \(viewModel.selectedDate.formatted(.dateTime.month().day().weekday()))")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
                             if viewModel.filteredEvents.isEmpty {
                                 VStack(spacing: 12) {
                                     Image(systemName: "calendar.badge.exclamationmark")

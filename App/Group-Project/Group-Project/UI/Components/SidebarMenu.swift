@@ -152,6 +152,21 @@ struct SidebarMenuContent: View {
                         #endif
                     }
                 }
+
+                MenuButton(
+                    title: "Get Help",
+                    icon: "questionmark.circle"
+                ) {
+                    withAnimation {
+                        menuState.isShowing = false
+                        menuState.showingHelp = true
+                        #if DEBUG
+                        print("🔍 Get Help button tapped")
+                        print("   menuState ID: \(menuState.id)")
+                        print("   showingHelp: \(menuState.showingHelp)")
+                        #endif
+                    }
+                }
             }
             .padding(.horizontal, Constants.Padding.standard)
             .padding(.bottom, Constants.Padding.standard)
