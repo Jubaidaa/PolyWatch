@@ -4,8 +4,6 @@ struct UpcomingView: View {
     @StateObject private var viewModel = ElectionsViewModel()
     @StateObject private var stateManager = StateManager()
     @Environment(\.presentationMode) var presentationMode
-<<<<<<< Updated upstream
-=======
     @State private var showVoterRegistration = false
     @State private var selectedView: ViewType = .list
     @EnvironmentObject private var menuState: MenuState
@@ -15,7 +13,6 @@ struct UpcomingView: View {
         case list
         case calendar
     }
->>>>>>> Stashed changes
     
     var filteredElections: [Election] {
         guard let selectedState = stateManager.selectedState else {
@@ -32,18 +29,19 @@ struct UpcomingView: View {
             VStack(spacing: 0) {
                 TopBarView(
                     onMenuTap: {
-                        withAnimation {
-                            menuState.isShowing = true
-                        }
+                        withAnimation { menuState.isShowing = true }
                     },
                     onLogoTap: onLogoTap,
                     onSearchTap: {}
                 )
                 
+                // You could insert a picker here to toggle selectedView between .list and .calendar
+                
                 if viewModel.isLoading {
                     Spacer()
                     ProgressView("Loading elections...")
                     Spacer()
+                    
                 } else if let error = viewModel.error {
                     Spacer()
                     VStack(spacing: Constants.Padding.standard) {
@@ -58,9 +56,9 @@ struct UpcomingView: View {
                     }
                     .padding()
                     Spacer()
+                    
                 } else if viewModel.elections.isEmpty {
                     Spacer()
-                    // Center Image
                     Image("vote")
                         .resizable()
                         .scaledToFit()
@@ -68,42 +66,29 @@ struct UpcomingView: View {
                         .padding(.vertical, Constants.Padding.standard / 2)
                         .accessibilityLabel("Voting Information")
                     Spacer()
+                    
                 } else {
-<<<<<<< Updated upstream
-                    ScrollView {
-                        LazyVStack(spacing: Constants.Padding.standard) {
-                            ForEach(viewModel.elections) { election in
-                                ElectionCard(election: election, dateFormatter: viewModel.formatDate)
-                                    .padding(.horizontal)
-=======
                     if selectedView == .list {
                         ScrollView {
                             LazyVStack(spacing: Constants.Padding.standard) {
-                                ForEach(filteredElections.sorted { election1, election2 in
-                                    election1.electionDay < election2.electionDay
-                                }) { election in
+                                ForEach(filteredElections.sorted { $0.electionDay < $1.electionDay }) { election in
                                     ElectionCard(election: election, dateFormatter: viewModel.formatDate)
                                         .padding(.horizontal)
                                 }
->>>>>>> Stashed changes
                             }
                         }
-<<<<<<< Updated upstream
-                        .padding(.vertical)
-=======
                     } else {
-                        CalendarView(elections: filteredElections, dateFormatter: viewModel.formatDate)
->>>>>>> Stashed changes
+                        ElectionCalendarView(onLogoTap: onLogoTap)
                     }
                 }
                 
                 // Voter Action Buttons
                 VStack(spacing: Constants.Padding.standard) {
-                    Button(action: {
+                    Button {
                         if let url = URL(string: Constants.URLs.registerToVote) {
                             UIApplication.shared.open(url)
                         }
-                    }) {
+                    } label: {
                         HStack {
                             Image(systemName: "pencil.circle.fill")
                                 .font(.title2)
@@ -114,11 +99,11 @@ struct UpcomingView: View {
                     .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
                     .accessibilityHint("Opens voter registration website")
                     
-                    Button(action: {
+                    Button {
                         if let url = URL(string: Constants.URLs.checkVoterStatus) {
                             UIApplication.shared.open(url)
                         }
-                    }) {
+                    } label: {
                         HStack {
                             Image(systemName: "person.text.rectangle.fill")
                                 .font(.title2)
@@ -175,5 +160,7 @@ struct ElectionCard: View {
 struct UpcomingView_Previews: PreviewProvider {
     static var previews: some View {
         UpcomingView(onLogoTap: {})
+            .environmentObject(MenuState())
     }
-} 
+}
+

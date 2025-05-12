@@ -44,20 +44,6 @@ struct HomeView: View {
                             Text("Upcoming Elections")
                                 .font(.headline)
                         }
-<<<<<<< Updated upstream
-                        .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.secondary))
-                        
-                        NavigationLink(destination: EventsListView()) {
-                            HStack {
-                                Image(systemName: "star.fill")
-                                    .font(.title2)
-                                Text("Events")
-                                    .font(.headline)
-                            }
-                        }
-                        .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
-=======
->>>>>>> Stashed changes
                     }
                     .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.secondary))
                     
@@ -83,4 +69,5 @@ struct HomeView_Previews: PreviewProvider {
         HomeView(onLogoTap: {})
             .environmentObject(MenuState())
     }
-} 
+}
+

@@ -27,11 +27,9 @@ struct GlobalMenuModifier: ViewModifier {
                         Spacer()
                             .frame(width: 20)
                         
-                        WithSidebarMenu(onLogoTap: onLogoTap) {
-                            EmptyView() // Only WithSidebarMenu should be used, SidebarMenuContent is handled inside it
-                        }
-                        .frame(maxHeight: .infinity, alignment: .top)
-                        .padding(.top, geometry.safeAreaInsets.top + 10)
+                        SidebarMenuContent(onLogoTap: onLogoTap)
+                            .frame(maxHeight: .infinity, alignment: .top)
+                            .padding(.top, geometry.safeAreaInsets.top + 10)
                         
                         Spacer()
                     }
@@ -50,7 +48,7 @@ struct GlobalMenuModifier: ViewModifier {
             }
             
             if menuState.showingHelp {
-                VoterRegistrationView(showHelpDirectly: true)
+                VoterRegistrationView()
                     .zIndex(1000)
             }
             

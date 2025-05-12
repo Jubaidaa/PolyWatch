@@ -1,12 +1,9 @@
 import SwiftUI
 
 struct MainView: View {
-<<<<<<< Updated upstream
-=======
     @StateObject private var menuState = MenuState()
     @State private var selectedTab = 0
-    
->>>>>>> Stashed changes
+
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView(
@@ -17,14 +14,8 @@ struct MainView: View {
             }
             .tag(0)
             
-<<<<<<< Updated upstream
-            EventsListView()
-                .tabItem {
-                    Label("Events", systemImage: "star.fill")
-                }
-        }
-=======
-            EventsView(isModal: false,
+            EventsView(
+                isModal: false,
                 onLogoTap: { selectedTab = 0 }
             )
             .tabItem {
@@ -35,7 +26,6 @@ struct MainView: View {
         .tabViewStyle(.page)
         .environmentObject(menuState)
         .withGlobalMenu(onLogoTap: { selectedTab = 0 })
->>>>>>> Stashed changes
     }
 }
 
@@ -43,4 +33,5 @@ struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView()
     }
-} 
+}
+
