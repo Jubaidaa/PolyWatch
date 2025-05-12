@@ -599,7 +599,11 @@ struct ElectionCalendarView: View {
                 }
                 if menuState.isShowing {
                     VStack {
-                        SidebarMenuContent(onLogoTap: onLogoTap)
+                        SidebarMenuContent(onLogoTap: {
+                            withAnimation {
+                                menuState.returnToMainView()
+                            }
+                        })
                             .environmentObject(menuState)
                             .frame(maxWidth: 320)
                             .padding(.top, 60)

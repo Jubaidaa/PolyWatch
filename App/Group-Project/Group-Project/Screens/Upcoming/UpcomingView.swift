@@ -82,7 +82,11 @@ struct UpcomingView: View {
                             }
                         }
                     } else {
-                        ElectionCalendarView(onLogoTap: onLogoTap)
+                        ElectionCalendarView(onLogoTap: {
+                            withAnimation {
+                                menuState.returnToMainView()
+                            }
+                        })
                     }
                 }
                 
