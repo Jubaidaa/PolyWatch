@@ -24,63 +24,27 @@ struct EventsView: View {
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    // Custom Top Bar
-                    HStack {
-                        // Menu Button
-                        Button(action: {
+                    // Top Bar
+                    TopBarView(
+                        onMenuTap: {
                             withAnimation {
                                 menuState.isShowing = true
                             }
-                        }) {
-                            Image(systemName: "line.3.horizontal")
-                                .font(.system(size: Constants.Dimensions.iconSize))
-                                .foregroundColor(AppColors.TopBar.icons)
-                                .accessibilityLabel("Menu")
-                        }
-                        
-                        Spacer()
-                        
-                        // Center logo
-                        Button(action: {
-                            // Use the most direct approach to return to main menu
+                        },
+                        onLogoTap: {
                             withAnimation {
-                                // First dismiss any modals if presented
                                 if isModal {
                                     menuState.showingEvents = false
                                 }
-                                
-                                // Then close all overlays
                                 menuState.closeAllOverlays()
-                                
-                                // Then trigger return to main view notification
                                 NotificationCenter.default.post(
-                                    name: Notification.Name("returnToMainView"), 
+                                    name: Notification.Name("returnToMainView"),
                                     object: nil
                                 )
                             }
-                        }) {
-                            Image("sideicon")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: UIScreen.main.bounds.width * 0.6, height: Constants.Dimensions.topBarHeight)
-                                .foregroundColor(AppColors.white)
-                                .accessibilityLabel("Home")
-                        }
-                        
-                        Spacer()
-                        
-                        // Search icon
-                        Button(action: {}) {
-                            Image(systemName: "magnifyingglass")
-                                .font(.system(size: Constants.Dimensions.iconSize))
-                                .foregroundColor(AppColors.TopBar.icons)
-                                .accessibilityLabel("Search")
-                        }
-                    }
-                    .padding(.horizontal, Constants.Padding.standard)
-                    .padding(.vertical, Constants.Padding.vertical)
-                    .frame(height: Constants.Dimensions.topBarHeight)
-                    .background(AppColors.TopBar.background)
+                        },
+                        onSearchTap: {}
+                    )
                     
                     // Search and filter bar
                     searchBar
