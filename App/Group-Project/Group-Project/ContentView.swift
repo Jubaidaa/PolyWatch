@@ -114,11 +114,6 @@ struct ContentView: View {
                                 }
 
                                 NavigationLink(destination: EventsView(isModal: false)) {
-                                NavigationLink(destination: EventsView(isModal: false, onLogoTap: {
-                                    withAnimation {
-                                        rootMenuState.closeAllOverlays()
-                                    }
-                                })) {
                                     QuickActionButton(
                                         title: "Events",
                                         icon: "calendar.badge.clock",
@@ -169,11 +164,7 @@ struct ContentView: View {
                     .environmentObject(rootMenuState)
             }
             .fullScreenCover(isPresented: $rootMenuState.showingEvents) {
-                EventsView(isModal: true, onLogoTap: {
-                    withAnimation {
-                        rootMenuState.closeAllOverlays()
-                    }
-                })
+                EventsView(isModal: true)
                 .environmentObject(rootMenuState)
             }
             .fullScreenCover(isPresented: $rootMenuState.showingCalendar) {
