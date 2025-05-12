@@ -44,7 +44,7 @@ struct EventsView: View {
             .padding(.horizontal)
             
             // Event List
-            List(filteredEvents, id: \._id) { event in
+            List(filteredEvents) { event in
                 VStack(alignment: .leading, spacing: 4) {
                     Text(event.title)
                         .font(.headline)
