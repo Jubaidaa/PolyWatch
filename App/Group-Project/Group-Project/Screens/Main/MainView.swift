@@ -15,13 +15,7 @@ struct MainView: View {
             .tag(0)
             
             EventsView(
-                isModal: false,
-                onLogoTap: {
-                    withAnimation {
-                        menuState.closeAllOverlays()
-                        selectedTab = 0
-                    }
-                }
+                isModal: false
             )
             .tabItem {
                 Label("Events", systemImage: "star.fill")
