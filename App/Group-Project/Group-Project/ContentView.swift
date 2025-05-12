@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 // MARK: - Main ContentView
 
@@ -54,7 +55,7 @@ struct ContentView: View {
                         onMenuTap: { withAnimation { rootMenuState.isShowing = true } },
                         onLogoTap: {
                             withAnimation {
-                                rootMenuState.closeAllOverlays()
+                                rootMenuState.returnToMainView()
                             }
                         },
                         onSearchTap: {}
@@ -80,11 +81,6 @@ struct ContentView: View {
                                 }
                                 .frame(height: 320)
                                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-                                .onReceive(timer) { _ in
-                                    withAnimation {
-                                        currentArticleIndex = (currentArticleIndex + 1) % max(1, articlesToShow.count)
-                                    }
-                                }
                             }
 
                             // New Events Section
@@ -198,11 +194,6 @@ struct ContentView: View {
             .task {
                 // Fetch RSS feed data when the view appears
                 await homeViewModel.fetchCarouselNews()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .returnToMainView)) { _ in
-                withAnimation {
-                    selectedTab = 0
-                }
             }
         }
     }
