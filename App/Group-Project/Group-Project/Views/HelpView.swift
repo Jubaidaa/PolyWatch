@@ -2,8 +2,9 @@ import SwiftUI
 
 struct HelpView: View {
     @EnvironmentObject private var menuState: MenuState
-    @State private var selectedSection: InfoSection = .requirements
+    @State private var selectedSection: InfoSection = .rights
     @State private var selectedDetail: DetailInfo?
+    @Environment(\.dismiss) private var dismiss
     
     enum InfoSection: String, CaseIterable {
         case requirements = "Requirements"
@@ -64,8 +65,12 @@ struct HelpView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Close") {
-                        withAnimation {
-                            menuState.showingHelp = false
+                        dismiss()
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation {
+                                menuState.showingVoterRegistration = true
+                            }
                         }
                     }
                     .foregroundColor(AppColors.blue)
