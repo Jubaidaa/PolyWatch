@@ -3,12 +3,20 @@ import SwiftUI
 struct HelpView: View {
     @EnvironmentObject private var menuState: MenuState
     @State private var selectedSection: InfoSection = .requirements
-    @State private var selectedDetail: VoterRegistrationView.DetailInfo?
+    @State private var selectedDetail: DetailInfo?
     
     enum InfoSection: String, CaseIterable {
         case requirements = "Requirements"
         case rights = "Rights"
         case resources = "Resources"
+    }
+    
+    // Define DetailInfo inside HelpView
+    struct DetailInfo: Identifiable {
+        let id = UUID()
+        let title: String
+        let content: [String]
+        let links: [(title: String, url: String)]
     }
     
     var body: some View {
@@ -64,7 +72,61 @@ struct HelpView: View {
                 }
             }
             .sheet(item: $selectedDetail) { detail in
-                DetailView(detail: detail)
+                HelpDetailView(detail: detail)
+            }
+        }
+    }
+    
+    // Rename DetailView to HelpDetailView
+    struct HelpDetailView: View {
+        @Environment(\.dismiss) private var dismiss
+        let detail: DetailInfo
+        
+        var body: some View {
+            NavigationView {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text(detail.title)
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .padding(.top)
+                        
+                        ForEach(detail.content, id: \.self) { line in
+                            Text(line)
+                                .padding(.vertical, line.isEmpty ? 8 : 2)
+                        }
+                        
+                        if !detail.links.isEmpty {
+                            VStack(spacing: 12) {
+                                ForEach(detail.links, id: \.title) { link in
+                                    Button {
+                                        if let url = URL(string: link.url) {
+                                            UIApplication.shared.open(url)
+                                        }
+                                    } label: {
+                                        Text(link.title)
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                            .frame(maxWidth: .infinity)
+                                            .padding()
+                                            .background(AppColors.blue)
+                                            .cornerRadius(8)
+                                    }
+                                }
+                            }
+                            .padding(.top, 8)
+                        }
+                    }
+                    .padding()
+                }
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Done") {
+                            dismiss()
+                        }
+                    }
+                }
             }
         }
     }
@@ -188,59 +250,6 @@ struct HelpView: View {
             )
         }
         .padding()
-    }
-}
-
-struct DetailView: View {
-    @Environment(\.dismiss) private var dismiss
-    let detail: VoterRegistrationView.DetailInfo
-    
-    var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text(detail.title)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding(.top)
-                    
-                    ForEach(detail.content, id: \.self) { line in
-                        Text(line)
-                            .padding(.vertical, line.isEmpty ? 8 : 2)
-                    }
-                    
-                    if !detail.links.isEmpty {
-                        VStack(spacing: 12) {
-                            ForEach(detail.links, id: \.title) { link in
-                                Button {
-                                    if let url = URL(string: link.url) {
-                                        UIApplication.shared.open(url)
-                                    }
-                                } label: {
-                                    Text(link.title)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .padding()
-                                        .background(AppColors.blue)
-                                        .cornerRadius(8)
-                                }
-                            }
-                        }
-                        .padding(.top, 8)
-                    }
-                }
-                .padding()
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
-        }
     }
 }
 
