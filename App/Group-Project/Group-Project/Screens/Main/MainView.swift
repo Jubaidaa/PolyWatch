@@ -36,6 +36,11 @@ struct MainView: View {
                 selectedTab = 0
             }
         })
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("returnToMainView"))) { _ in
+            withAnimation {
+                selectedTab = 0
+            }
+        }
     }
 }
 

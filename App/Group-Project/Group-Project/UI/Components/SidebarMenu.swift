@@ -57,6 +57,15 @@ class MenuState: ObservableObject {
             #endif
         }
     }
+    
+    // Add the function to return to main view
+    func returnToMainView() {
+        // First close all overlays
+        closeAllOverlays()
+        
+        // Then post a notification that we want to return to main view
+        NotificationCenter.default.post(name: Notification.Name("returnToMainView"), object: nil)
+    }
 }
 
 // Note: GlobalMenuModifier is defined in GlobalMenuModifier.swift
