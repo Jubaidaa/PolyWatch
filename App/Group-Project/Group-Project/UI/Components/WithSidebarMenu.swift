@@ -11,7 +11,7 @@ struct WithSidebarMenu<Content: View>: View {
     }
 
     var body: some View {
-        let menuWidth: CGFloat = 320
+        let _: CGFloat = 320
         ZStack(alignment: .leading) {
             VStack(spacing: 0) {
                 TopBarView(

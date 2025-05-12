@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct GlobalMenuModifier: ViewModifier {
-    @StateObject private var menuState = MenuState()
+    // Use the passed MenuState instead of creating a new one
+    @ObservedObject var menuState: MenuState
     
     // Add a closure to handle logo tap, defaulting to do nothing
     var onLogoTap: () -> Void = {}
@@ -27,7 +28,12 @@ struct GlobalMenuModifier: ViewModifier {
                         Spacer()
                             .frame(width: 20)
                         
-                        SidebarMenuContent(onLogoTap: onLogoTap)
+                        SidebarMenuContent(onLogoTap: {
+                            withAnimation {
+                                menuState.closeAllOverlays()
+                            }
+                        })
+                            .environmentObject(menuState)
                             .frame(maxHeight: .infinity, alignment: .top)
                             .padding(.top, geometry.safeAreaInsets.top + 10)
                         
@@ -38,32 +44,46 @@ struct GlobalMenuModifier: ViewModifier {
             }
             
             if menuState.showingCalendar {
-                ElectionCalendarView(onLogoTap: onLogoTap)
-                    .zIndex(1000)
+                ElectionCalendarView(onLogoTap: {
+                    withAnimation {
+                        menuState.closeAllOverlays()
+                    }
+                })
+                .environmentObject(menuState)
+                .zIndex(1000)
             }
             
             if menuState.showingVoterRegistration {
                 VoterRegistrationView()
+                    .environmentObject(menuState)
                     .zIndex(1000)
             }
             
             if menuState.showingHelp {
                 VoterRegistrationView()
+                    .environmentObject(menuState)
                     .zIndex(1000)
             }
             
             if menuState.showingLocalNews {
                 LocalNewsView()
+                    .environmentObject(menuState)
                     .zIndex(1000)
             }
             
             if menuState.showingBreakingNews {
                 BreakingNewsView()
+                    .environmentObject(menuState)
                     .zIndex(1000)
             }
             
             if menuState.showingEvents {
-                EventsView(isModal: true, onLogoTap: onLogoTap)
+                EventsView(isModal: true, onLogoTap: {
+                    withAnimation {
+                        menuState.closeAllOverlays()
+                    }
+                })
+                    .environmentObject(menuState)
                     .zIndex(1000)
             }
         }
@@ -74,13 +94,12 @@ struct GlobalMenuModifier: ViewModifier {
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: menuState.showingLocalNews)
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: menuState.showingBreakingNews)
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: menuState.showingEvents)
-        .environmentObject(menuState)
     }
 }
 
 // Extension to make it easier to add the menu to any view
 extension View {
-    func withGlobalMenu(onLogoTap: @escaping () -> Void = {}) -> some View {
-        modifier(GlobalMenuModifier(onLogoTap: onLogoTap))
+    func withGlobalMenu(menuState: MenuState, onLogoTap: @escaping () -> Void = {}) -> some View {
+        modifier(GlobalMenuModifier(menuState: menuState, onLogoTap: onLogoTap))
     }
 } 

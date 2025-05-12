@@ -207,6 +207,9 @@ struct MobilizeEvent: Codable {
             }
         }
         
+        // Create a nil Price value of the correct type
+        let priceValue: Event.Price? = nil
+        
         return Event(
             title: title,
             date: startDate,
@@ -214,12 +217,12 @@ struct MobilizeEvent: Codable {
             location: location?.venue ?? "Online/Location TBA",
             description: (description ?? "") + "\n\nSource: MobilizeAmerica",
             imageURL: featured_image_url,
-            price: nil,
+            price: priceValue,
             registrationRequired: true,
             registrationURL: browser_url,
             organizer: sponsor?.name ?? "",
             tags: allTags,
-            status: .upcoming,
+            status: Event.Status.upcoming,
             state: stateTag
         )
     }

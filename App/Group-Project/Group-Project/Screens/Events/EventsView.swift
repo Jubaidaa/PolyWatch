@@ -23,7 +23,23 @@ struct EventsView: View {
             VStack(spacing: 0) {
                 TopBarView(
                     onMenuTap: { withAnimation { menuState.isShowing = true } },
-                    onLogoTap: onLogoTap,
+                    onLogoTap: {
+                        // Use a robust approach to ensure navigation works
+                        // First clear view-specific state
+                        withAnimation(.easeInOut(duration: 0.1)) {
+                            self.selectedFilter = .all
+                            self.searchText = ""
+                            self.showingEventDetail = false
+                        }
+                        
+                        // Small delay to ensure state changes are processed
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            // Then close all overlays
+                            withAnimation {
+                                menuState.closeAllOverlays()
+                            }
+                        }
+                    },
                     onSearchTap: {}
                 )
 

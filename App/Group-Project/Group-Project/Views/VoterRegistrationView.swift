@@ -61,9 +61,19 @@ struct VoterRegistrationView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
-                leading: Button("Close") {
-                    withAnimation {
-                        menuState.showingVoterRegistration = false
+                leading: HStack {
+                    Button(action: {
+                        withAnimation {
+                            menuState.closeAllOverlays()
+                        }
+                    }) {
+                        Text("PolyWatch")
+                            .fontWeight(.bold)
+                    }
+                    Button("Close") {
+                        withAnimation {
+                            menuState.showingVoterRegistration = false
+                        }
                     }
                 }
             )

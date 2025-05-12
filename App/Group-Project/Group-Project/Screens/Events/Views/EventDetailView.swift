@@ -7,6 +7,7 @@ import SafariServices
 struct EventDetailView: View {
     let event: Event
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var menuState: MenuState
     @State private var showingRegistration = false
 
     var body: some View {
@@ -147,6 +148,17 @@ struct EventDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Home") {
+                    dismiss()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation {
+                            menuState.closeAllOverlays()
+                        }
+                    }
+                }
+            }
+            
             if event.registrationRequired {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Register") {

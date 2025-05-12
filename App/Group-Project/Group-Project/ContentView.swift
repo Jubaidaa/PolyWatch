@@ -13,7 +13,8 @@ struct ArticleItem: Identifiable {
 // MARK: - Main ContentView
 
 struct ContentView: View {
-    @EnvironmentObject private var menuState: MenuState
+    // Single source of truth for menu state
+    @ObservedObject var rootMenuState: MenuState
     @State private var selectedTab = 0
     @State private var currentArticleIndex = 0
     @State private var showProfile = false
@@ -25,6 +26,8 @@ struct ContentView: View {
         ArticleItem(title: "Community Meeting Highlights", image: "news3", date: "1 day ago", source: "ABC News")
     ]
 
+    @StateObject private var stateManager = EventsStateManager()
+
     var body: some View {
         NavigationView {
             ZStack(alignment: .leading) {
@@ -33,10 +36,15 @@ struct ContentView: View {
 
                 VStack(spacing: 0) {
                     TopBarView(
-                        onMenuTap: { withAnimation { menuState.isShowing = true } },
-                        onLogoTap: {},
+                        onMenuTap: { withAnimation { rootMenuState.isShowing = true } },
+                        onLogoTap: {
+                            withAnimation {
+                                rootMenuState.closeAllOverlays()
+                            }
+                        },
                         onSearchTap: {}
                     )
+                    .environmentObject(rootMenuState)
 
                     // Main Content
                     ScrollView {
@@ -74,7 +82,11 @@ struct ContentView: View {
 
                             // Quick Actions
                             HStack(spacing: 20) {
-                                NavigationLink(destination: UpcomingView(onLogoTap: {})) {
+                                NavigationLink(destination: UpcomingView(onLogoTap: {
+                                    withAnimation {
+                                        rootMenuState.closeAllOverlays()
+                                    }
+                                })) {
                                     QuickActionButton(
                                         title: "Upcoming\nElections",
                                         icon: "calendar",
@@ -82,7 +94,11 @@ struct ContentView: View {
                                     )
                                 }
 
-                                NavigationLink(destination: EventsView(isModal: false, onLogoTap: {})) {
+                                NavigationLink(destination: EventsView(isModal: false, onLogoTap: {
+                                    withAnimation {
+                                        rootMenuState.closeAllOverlays()
+                                    }
+                                })) {
                                     QuickActionButton(
                                         title: "Events",
                                         icon: "calendar.badge.clock",
@@ -99,17 +115,21 @@ struct ContentView: View {
                 }
 
                 // Dimmed overlay & sidebar
-                if menuState.isShowing {
+                if rootMenuState.isShowing {
                     Color.black.opacity(0.4)
                         .ignoresSafeArea()
-                        .onTapGesture { withAnimation { menuState.isShowing = false } }
+                        .onTapGesture { withAnimation { rootMenuState.isShowing = false } }
                         .zIndex(1)
 
                     VStack {
-                        SidebarMenuContent(onLogoTap: {})
-                            .environmentObject(menuState)
-                            .frame(maxWidth: 320)
-                            .padding(.top, 60)
+                        SidebarMenuContent(onLogoTap: {
+                            withAnimation {
+                                rootMenuState.closeAllOverlays()
+                            }
+                        })
+                        .environmentObject(rootMenuState)
+                        .frame(maxWidth: 320)
+                        .padding(.top, 60)
                         Spacer()
                     }
                     .transition(.move(edge: .leading))
@@ -120,25 +140,33 @@ struct ContentView: View {
             .sheet(isPresented: $showProfile) {
                 UserProfileView()
             }
-            .fullScreenCover(isPresented: $menuState.showingHelp) {
+            .fullScreenCover(isPresented: $rootMenuState.showingHelp) {
                 VoterRegistrationView()
-                    .environmentObject(menuState)
+                    .environmentObject(rootMenuState)
             }
-            .fullScreenCover(isPresented: $menuState.showingEvents) {
-                EventsView(isModal: true, onLogoTap: {})
-                    .environmentObject(menuState)
+            .fullScreenCover(isPresented: $rootMenuState.showingEvents) {
+                EventsView(isModal: true, onLogoTap: {
+                    withAnimation {
+                        rootMenuState.closeAllOverlays()
+                    }
+                })
+                .environmentObject(rootMenuState)
             }
-            .fullScreenCover(isPresented: $menuState.showingCalendar) {
-                ElectionCalendarView(onLogoTap: {})
-                    .environmentObject(menuState)
+            .fullScreenCover(isPresented: $rootMenuState.showingCalendar) {
+                ElectionCalendarView(onLogoTap: {
+                    withAnimation {
+                        rootMenuState.closeAllOverlays()
+                    }
+                })
+                .environmentObject(rootMenuState)
             }
-            .fullScreenCover(isPresented: $menuState.showingLocalNews) {
+            .fullScreenCover(isPresented: $rootMenuState.showingLocalNews) {
                 LocalNewsView()
-                    .environmentObject(menuState)
+                    .environmentObject(rootMenuState)
             }
-            .fullScreenCover(isPresented: $menuState.showingBreakingNews) {
+            .fullScreenCover(isPresented: $rootMenuState.showingBreakingNews) {
                 BreakingNewsView()
-                    .environmentObject(menuState)
+                    .environmentObject(rootMenuState)
             }
         }
     }
@@ -260,8 +288,7 @@ struct ActivityCard: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
-            .environmentObject(MenuState())
+        ContentView(rootMenuState: MenuState())
     }
 }
 

@@ -6,6 +6,9 @@ import Combine
 
 /// Global state object to manage menu visibility
 class MenuState: ObservableObject {
+    // Add an identifier to help debug multiple instances
+    let id = UUID()
+    
     @Published var isShowing                = false
     @Published var showingCalendar          = false
     @Published var showingVoterRegistration = false
@@ -15,6 +18,41 @@ class MenuState: ObservableObject {
     // Newly added to support GlobalMenuModifier.swift
     @Published var showingHelp              = false
     @Published var showingEvents            = false
+    
+    // Function to close all overlays at once with a more robust implementation
+    func closeAllOverlays() {
+        #if DEBUG
+        print("🚨 MenuState[\(self.id)] - closeAllOverlays() called")
+        #endif
+        
+        // To guarantee navigation works, we'll shut down all overlays in two phases
+        // First, close all content overlays (panels)
+        withAnimation(.easeInOut(duration: 0.2)) {
+            self.showingCalendar = false
+            self.showingVoterRegistration = false
+            self.showingLocalNews = false
+            self.showingBreakingNews = false
+            self.showingHelp = false
+            self.showingEvents = false
+        }
+        
+        // Give a small delay before closing the sidebar
+        // This ensures the other dismissals have time to complete
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                self.isShowing = false
+            }
+            
+            #if DEBUG
+            print("✅ MenuState[\(self.id)] - All overlays should be closed now")
+            print("   isShowing: \(self.isShowing)")
+            print("   showingEvents: \(self.showingEvents)")
+            print("   showingCalendar: \(self.showingCalendar)")
+            print("   showingLocalNews: \(self.showingLocalNews)")
+            print("   showingBreakingNews: \(self.showingBreakingNews)")
+            #endif
+        }
+    }
 }
 
 // Note: GlobalMenuModifier is defined in GlobalMenuModifier.swift
@@ -27,7 +65,11 @@ struct SidebarMenuContent: View {
         VStack(spacing: 0) {
             // Header
             HStack {
-                Button(action: onLogoTap) {
+                Button(action: {
+                    withAnimation {
+                        menuState.closeAllOverlays()
+                    }
+                }) {
                     Text("POLYWATCH")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)

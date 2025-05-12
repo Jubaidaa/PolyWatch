@@ -27,7 +27,7 @@ enum EventFilter: String, CaseIterable, Identifiable {
 
 /// Your main Event model
 struct Event: Identifiable, Codable {
-    let id = UUID()
+    var id = UUID()
     let title: String
     let date: Date
     let endDate: Date?
@@ -41,6 +41,50 @@ struct Event: Identifiable, Codable {
     let tags: [String]
     let status: Status
     let state: String?
+    
+    // Add standard memberwise initializer
+    init(title: String, date: Date, endDate: Date?, location: String, description: String, 
+         imageURL: String?, price: Price?, registrationRequired: Bool, registrationURL: String?,
+         organizer: String, tags: [String], status: Status, state: String?) {
+        self.title = title
+        self.date = date
+        self.endDate = endDate
+        self.location = location
+        self.description = description
+        self.imageURL = imageURL
+        self.price = price
+        self.registrationRequired = registrationRequired
+        self.registrationURL = registrationURL
+        self.organizer = organizer
+        self.tags = tags
+        self.status = status
+        self.state = state
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case title, date, endDate, location, description, imageURL
+        case price, registrationRequired, registrationURL, organizer, tags
+        case status, state
+        // Note: id is intentionally excluded since we generate it
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        title = try container.decode(String.self, forKey: .title)
+        date = try container.decode(Date.self, forKey: .date)
+        endDate = try container.decodeIfPresent(Date.self, forKey: .endDate)
+        location = try container.decode(String.self, forKey: .location)
+        description = try container.decode(String.self, forKey: .description)
+        imageURL = try container.decodeIfPresent(String.self, forKey: .imageURL)
+        price = try container.decodeIfPresent(Price.self, forKey: .price)
+        registrationRequired = try container.decode(Bool.self, forKey: .registrationRequired)
+        registrationURL = try container.decodeIfPresent(String.self, forKey: .registrationURL)
+        organizer = try container.decode(String.self, forKey: .organizer)
+        tags = try container.decode([String].self, forKey: .tags)
+        status = try container.decode(Status.self, forKey: .status)
+        state = try container.decodeIfPresent(String.self, forKey: .state)
+        // id is generated automatically by the default initializer
+    }
 
     enum Status: String, Codable {
         case upcoming

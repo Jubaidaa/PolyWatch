@@ -302,6 +302,23 @@ struct ElectionCalendarView: View {
                     .zIndex(2)
                 }
             }
+            .navigationBarItems(
+                leading: HStack {
+                    Button(action: {
+                        withAnimation {
+                            menuState.closeAllOverlays()
+                        }
+                    }) {
+                        Text("PolyWatch")
+                            .fontWeight(.bold)
+                    }
+                    Button("Close") {
+                        withAnimation {
+                            menuState.showingCalendar = false
+                        }
+                    }
+                }
+            )
             .navigationBarHidden(true)
         }
     }

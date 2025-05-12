@@ -85,9 +85,7 @@ struct UpcomingView: View {
                 // Voter Action Buttons
                 VStack(spacing: Constants.Padding.standard) {
                     Button {
-                        if let url = URL(string: Constants.URLs.registerToVote) {
-                            UIApplication.shared.open(url)
-                        }
+                        showVoterRegistration = true
                     } label: {
                         HStack {
                             Image(systemName: "pencil.circle.fill")
@@ -97,7 +95,11 @@ struct UpcomingView: View {
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
-                    .accessibilityHint("Opens voter registration website")
+                    .accessibilityHint("Shows California voter registration info")
+                    .sheet(isPresented: $showVoterRegistration) {
+                        VoterRegistrationView()
+                            .environmentObject(menuState)
+                    }
                     
                     Button {
                         if let url = URL(string: Constants.URLs.checkVoterStatus) {

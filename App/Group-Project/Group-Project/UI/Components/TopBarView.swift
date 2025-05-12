@@ -25,7 +25,11 @@ struct TopBarView: View {
                 Spacer()
                 
                 // Center logo
-                Button(action: onLogoTap) {
+                Button(action: {
+                    withAnimation {
+                        menuState.closeAllOverlays()
+                    }
+                }) {
                     Image("sideicon")
                         .resizable()
                         .scaledToFit()

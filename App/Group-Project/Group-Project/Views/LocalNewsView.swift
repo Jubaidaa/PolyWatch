@@ -3,137 +3,116 @@ import SwiftUI
 struct LocalNewsView: View {
     @EnvironmentObject private var menuState: MenuState
     @StateObject private var viewModel = NewsViewModel()
-    @State private var currentPage = 0
-    @State private var autoRotationTimer: Timer?
-    
-    private let articlesPerPage = 4
-    
-    var currentArticles: [RSSItem] {
-        let totalArticles = viewModel.currentArticles
-        guard !totalArticles.isEmpty else { return [] }
-        
-        let startIndex = (currentPage * articlesPerPage) % totalArticles.count
-        var articles: [RSSItem] = []
-        
-        for offset in 0..<articlesPerPage {
-            let index = (startIndex + offset) % totalArticles.count
-            articles.append(totalArticles[index])
-        }
-        
-        return articles
-    }
-    
-    var totalPages: Int {
-        let count = viewModel.currentArticles.count
-        return max(1, (count + articlesPerPage - 1) / articlesPerPage)
-    }
+    @State private var scrollOffset: CGFloat = 0
+    @State private var showScrollToTop = false
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 8) {
-                        Text("Local News")
-                            .font(.system(size: 34, weight: .bold))
-                        Text("Latest updates from your area")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.top, 20)
-                    .padding(.bottom, 10)
-                    
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .padding()
-                    } else if viewModel.currentArticles.isEmpty {
-                        VStack(spacing: 12) {
-                            Image(systemName: "newspaper")
-                                .font(.largeTitle)
-                                .foregroundColor(.gray)
-                            Text("No articles available")
-                                .font(.headline)
-                                .foregroundColor(.gray)
+            ZStack(alignment: .bottomTrailing) {
+                ScrollViewReader { scrollProxy in
+                    ScrollView(showsIndicators: true) {
+                        GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: ScrollOffsetPreferenceKey.self,
+                                value: geometry.frame(in: .named("scrollView")).minY
+                            )
                         }
-                        .padding()
-                    } else {
-                        // News Articles Stack
-                        VStack(spacing: 20) {
-                            // Article Stack
-                            VStack(spacing: 20) {
-                                ForEach(currentArticles) { article in
-                                    NewsArticleCard(article: article)
-                                }
+                        .frame(height: 0)
+                        .id("scrollTop")
+                        
+                        VStack(spacing: 24) {
+                            // Header
+                            VStack(spacing: 8) {
+                                Text("Local News")
+                                    .font(.system(size: 34, weight: .bold))
+                                Text("Latest updates from Bay Area sources")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
                             }
-                            .padding(.horizontal)
+                            .padding(.top, 20)
+                            .padding(.bottom, 10)
                             
-                            // Navigation Controls
-                            if viewModel.currentArticles.count > articlesPerPage {
-                                HStack(spacing: 20) {
-                                    Button(action: {
-                                        withAnimation {
-                                            currentPage = (currentPage - 1 + totalPages) % totalPages
-                                        }
-                                    }) {
-                                        Image(systemName: "chevron.left")
-                                            .foregroundColor(.red)
+                            if viewModel.isLoading {
+                                ProgressView()
+                                    .padding()
+                            } else if viewModel.currentArticles.isEmpty {
+                                VStack(spacing: 12) {
+                                    Image(systemName: "newspaper")
+                                        .font(.largeTitle)
+                                        .foregroundColor(.gray)
+                                    Text("Loading articles...")
+                                        .font(.headline)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding()
+                                .frame(height: 300)
+                            } else {
+                                LazyVStack(spacing: 20) {
+                                    ForEach(viewModel.currentArticles) { article in
+                                        NewsItemView(item: article)
+                                            .id(article.id)
                                     }
-                                    
-                                    Text("Page \(currentPage + 1) of \(totalPages)")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                    
-                                    Button(action: {
-                                        withAnimation {
-                                            currentPage = (currentPage + 1) % totalPages
-                                        }
-                                    }) {
-                                        Image(systemName: "chevron.right")
-                                            .foregroundColor(.red)
-                                    }
+                                    Spacer().frame(height: 60)
                                 }
                                 .padding(.horizontal)
+                                .animation(.easeInOut(duration: 0.5), value: viewModel.currentArticles)
                             }
                         }
+                    }
+                    .coordinateSpace(name: "scrollView")
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                        scrollOffset = value
+                        showScrollToTop = value < -200
+                    }
+                    .refreshable {
+                        await viewModel.fetchLocalNews()
+                    }
+                    
+                    if showScrollToTop {
+                        Button(action: {
+                            withAnimation {
+                                scrollProxy.scrollTo("scrollTop", anchor: .top)
+                            }
+                        }) {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(.red.opacity(0.8))
+                                .shadow(radius: 3)
+                        }
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 20)
+                        .transition(.scale.combined(with: .opacity))
                     }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
-                leading: Button("Close") {
+                leading: Button(action: {
+                    withAnimation {
+                        menuState.closeAllOverlays()
+                    }
+                }) {
+                    Text("PolyWatch")
+                        .fontWeight(.bold)
+                },
+                trailing: Button("Close") {
                     withAnimation {
                         menuState.showingLocalNews = false
                     }
                 }
-                .foregroundColor(.blue)
             )
-            .refreshable {
-                await viewModel.fetchLocalNews()
-                currentPage = 0
-            }
             .task {
                 await viewModel.fetchLocalNews()
-                setupAutoRotation()
-            }
-            .onDisappear {
-                autoRotationTimer?.invalidate()
-                autoRotationTimer = nil
             }
         }
     }
-    
-    private func setupAutoRotation() {
-        // Cancel any existing timer
-        autoRotationTimer?.invalidate()
-        
-        // Create new timer
-        autoRotationTimer = Timer.scheduledTimer(withTimeInterval: 8.0, repeats: true) { _ in
-            Task { @MainActor in
-                withAnimation {
-                    currentPage = (currentPage + 1) % totalPages
-                }
-            }
-        }
+}
+
+// Preference key for tracking scroll offset
+struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
@@ -146,7 +125,7 @@ struct NewsArticleCard: View {
                 .font(.system(size: 22, weight: .bold))
                 .lineLimit(3)
             
-            Text(article.description)
+            Text(article.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil))
                 .font(.body)
                 .foregroundColor(.secondary)
                 .lineLimit(3)
@@ -191,3 +170,4 @@ struct NewsArticleCard: View {
     LocalNewsView()
         .environmentObject(MenuState())
 } 
+

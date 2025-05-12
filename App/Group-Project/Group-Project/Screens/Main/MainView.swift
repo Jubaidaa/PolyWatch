@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @StateObject private var menuState = MenuState()
+    @ObservedObject var menuState: MenuState
     @State private var selectedTab = 0
 
     var body: some View {
@@ -16,7 +16,12 @@ struct MainView: View {
             
             EventsView(
                 isModal: false,
-                onLogoTap: { selectedTab = 0 }
+                onLogoTap: {
+                    withAnimation {
+                        menuState.closeAllOverlays()
+                        selectedTab = 0
+                    }
+                }
             )
             .tabItem {
                 Label("Events", systemImage: "star.fill")
@@ -25,13 +30,18 @@ struct MainView: View {
         }
         .tabViewStyle(.page)
         .environmentObject(menuState)
-        .withGlobalMenu(onLogoTap: { selectedTab = 0 })
+        .withGlobalMenu(menuState: menuState, onLogoTap: {
+            withAnimation {
+                menuState.closeAllOverlays()
+                selectedTab = 0
+            }
+        })
     }
 }
 
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        MainView()
+        MainView(menuState: MenuState())
     }
 }
 

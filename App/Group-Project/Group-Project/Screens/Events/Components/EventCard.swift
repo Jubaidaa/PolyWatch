@@ -77,19 +77,22 @@ struct EventCard: View {
 }
 
 #Preview {
-    EventCard(event: Event(
+    // Create a sample event using the proper initializer
+    let sampleEvent = Event(
         title: "Sample Event",
         date: Date(),
         endDate: nil,
         location: "123 Main St",
         description: "A sample event description",
-        imageURL: nil,
+        imageURL: nil, 
         price: nil,
         registrationRequired: true,
         registrationURL: nil,
         organizer: "Sample Organizer",
         tags: ["Sample", "Event"],
-        status: .upcoming,
+        status: Event.Status.upcoming,
         state: "CA"
-    ))
+    )
+    
+    EventCard(event: sampleEvent)
 } 
