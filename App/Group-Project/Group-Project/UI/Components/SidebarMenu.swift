@@ -23,6 +23,8 @@ class MenuState: ObservableObject {
     func closeAllOverlays() {
         #if DEBUG
         print("🚨 MenuState[\(self.id)] - closeAllOverlays() called")
+        print("   BEFORE: showingVoterRegistration: \(self.showingVoterRegistration)")
+        print("   BEFORE: showingCalendar: \(self.showingCalendar)")
         #endif
         
         // To guarantee navigation works, we'll shut down all overlays in two phases
@@ -50,6 +52,8 @@ class MenuState: ObservableObject {
             print("   showingCalendar: \(self.showingCalendar)")
             print("   showingLocalNews: \(self.showingLocalNews)")
             print("   showingBreakingNews: \(self.showingBreakingNews)")
+            print("   showingVoterRegistration: \(self.showingVoterRegistration)")
+            print("   showingHelp: \(self.showingHelp)")
             #endif
         }
     }
@@ -72,7 +76,7 @@ struct SidebarMenuContent: View {
                 }) {
                     Text("POLYWATCH")
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.white)
                 }
                 Spacer()
                 Button(action: {
@@ -81,13 +85,12 @@ struct SidebarMenuContent: View {
                     }
                 }) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(.system(size: Constants.Dimensions.iconSize))
+                        .foregroundColor(AppColors.white)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 12)
+            .padding(.horizontal, Constants.Padding.standard)
+            .padding(.vertical, Constants.Padding.vertical)
 
             // Menu Items
             VStack(spacing: 16) {
@@ -118,6 +121,11 @@ struct SidebarMenuContent: View {
                     withAnimation {
                         menuState.isShowing = false
                         menuState.showingVoterRegistration = true
+                        #if DEBUG
+                        print("🔍 Register to Vote button tapped")
+                        print("   menuState ID: \(menuState.id)")
+                        print("   showingVoterRegistration: \(menuState.showingVoterRegistration)")
+                        #endif
                     }
                 }
 
@@ -128,24 +136,29 @@ struct SidebarMenuContent: View {
                     withAnimation {
                         menuState.isShowing = false
                         menuState.showingCalendar = true
+                        #if DEBUG
+                        print("🔍 Upcoming Events button tapped")
+                        print("   menuState ID: \(menuState.id)")
+                        print("   showingCalendar: \(menuState.showingCalendar)")
+                        #endif
                     }
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
+            .padding(.horizontal, Constants.Padding.standard)
+            .padding(.bottom, Constants.Padding.standard)
 
             Spacer()
 
             // Footer
             Text("© 2024 POLYWATCH")
                 .font(.system(size: 12))
-                .foregroundColor(.white.opacity(0.7))
-                .padding(.bottom, 16)
+                .foregroundColor(AppColors.white.opacity(0.7))
+                .padding(.bottom, Constants.Padding.standard)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 320)
-        .background(Color(red: 0.85, green: 0.15, blue: 0.15))
-        .cornerRadius(12)
+        .background(AppColors.red)
+        .cornerRadius(Constants.Dimensions.cornerRadius)
     }
 }
 
@@ -158,17 +171,17 @@ struct MenuButton: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Circle()
-                    .fill(Color.white.opacity(0.2))
+                    .fill(AppColors.white.opacity(0.2))
                     .frame(width: 32, height: 32)
                     .overlay(
                         Image(systemName: icon)
                             .font(.system(size: 14))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.white)
                     )
 
                 Text(title)
                     .font(.system(size: 16))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.white)
 
                 Spacer()
             }

@@ -30,6 +30,10 @@ struct EventsView: View {
                             self.selectedFilter = .all
                             self.searchText = ""
                             self.showingEventDetail = false
+                            #if DEBUG
+                            print("🏠 EventsView: PolyWatch button tapped - clearing view state")
+                            print("   menuState ID: \(menuState.id)")
+                            #endif
                         }
                         
                         // Small delay to ensure state changes are processed
@@ -37,6 +41,9 @@ struct EventsView: View {
                             // Then close all overlays
                             withAnimation {
                                 menuState.closeAllOverlays()
+                                #if DEBUG
+                                print("🏠 EventsView: PolyWatch button tapped - returning to home screen")
+                                #endif
                             }
                         }
                     },
@@ -57,6 +64,7 @@ struct EventsView: View {
                     Button("Exit") {
                         menuState.showingEvents = false
                     }
+                    .foregroundColor(AppColors.blue)
                 }
             }
         }
@@ -112,8 +120,8 @@ struct EventsView: View {
 
     @ViewBuilder
     private var content: some View {
-        if viewModel.isLoading {
-            // Loading state
+        if viewModel.isLoading && viewModel.events.isEmpty {
+            // Initial loading state
             VStack {
                 Spacer()
                 ProgressView("Loading events…")
@@ -192,7 +200,7 @@ struct EventsView: View {
             .foregroundColor(.white)
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
-            .background(Color.blue)
+            .background(AppColors.blue)
             .cornerRadius(8)
             Spacer()
         }
@@ -212,7 +220,7 @@ private struct FilterButton: View {
                 .font(.subheadline)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(isSelected ? Color.blue : Color.gray.opacity(0.1))
+                .background(isSelected ? AppColors.blue : Color.gray.opacity(0.1))
                 .foregroundColor(isSelected ? .white : .primary)
                 .clipShape(Capsule())
         }

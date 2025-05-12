@@ -7,10 +7,10 @@ struct VoterRegistrationView: View {
     @State private var selectedDetail: DetailInfo?
     
     enum InfoSection: String, CaseIterable {
-        case registration = "Registration"
-        case requirements = "Requirements"
+        case registration = "Register"
+        case requirements = "Require..."
         case deadlines = "Key Dates"
-        case rights = "Voter Rights"
+        case rights = "Rights"
         case resources = "Resources"
     }
     
@@ -23,60 +23,76 @@ struct VoterRegistrationView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 8) {
-                        Text("Register to Vote")
-                            .font(.system(size: 34, weight: .bold))
-                        Text("California Voter Information")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.top)
-                    
-                    // Section Picker
-                    Picker("Section", selection: $selectedSection) {
-                        ForEach(InfoSection.allCases, id: \.self) { section in
-                            Text(section.rawValue).tag(section)
+            ZStack {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Header
+                        VStack(spacing: 8) {
+                            Text("Register to Vote")
+                                .font(.system(size: 34, weight: .bold))
+                            Text("California Voter Information")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                         }
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal)
-                    
-                    // Content based on selected section
-                    switch selectedSection {
-                    case .registration:
-                        registrationSection
-                    case .requirements:
-                        requirementsSection
-                    case .deadlines:
-                        deadlinesSection
-                    case .rights:
-                        rightsSection
-                    case .resources:
-                        resourcesSection
+                        .padding(.top)
+                        
+                        // Section Picker
+                        Picker("Section", selection: $selectedSection) {
+                            ForEach(InfoSection.allCases, id: \.self) { section in
+                                Text(section.rawValue)
+                                    .font(.system(size: 13))
+                                    .tag(section)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal, Constants.Padding.standard)
+                        
+                        // Content based on selected section
+                        switch selectedSection {
+                        case .registration:
+                            registrationSection
+                        case .requirements:
+                            requirementsSection
+                        case .deadlines:
+                            deadlinesSection
+                        case .rights:
+                            rightsSection
+                        case .resources:
+                            resourcesSection
+                        }
                     }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: HStack {
-                    Button(action: {
-                        withAnimation {
-                            menuState.closeAllOverlays()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    HStack {
+                        Button(action: {
+                            withAnimation {
+                                menuState.closeAllOverlays()
+                                #if DEBUG
+                                print("🏠 VoterRegistrationView: PolyWatch button tapped - returning to home screen")
+                                print("   menuState ID: \(menuState.id)")
+                                #endif
+                            }
+                        }) {
+                            Text("PolyWatch")
+                                .fontWeight(.bold)
+                                .foregroundColor(AppColors.red)
                         }
-                    }) {
-                        Text("PolyWatch")
-                            .fontWeight(.bold)
-                    }
-                    Button("Close") {
-                        withAnimation {
-                            menuState.showingVoterRegistration = false
+                        
+                        Button("Close") {
+                            withAnimation {
+                                menuState.showingVoterRegistration = false
+                            }
                         }
+                        .foregroundColor(AppColors.blue)
                     }
                 }
-            )
+            }
             .sheet(item: $selectedDetail) { detail in
                 DetailView(detail: detail)
             }

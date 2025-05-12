@@ -1,15 +1,5 @@
 import SwiftUI
 
-// MARK: - Model for Carousel Articles
-
-struct ArticleItem: Identifiable {
-    let id = UUID()
-    let title: String
-    let image: String
-    let date: String
-    let source: String
-}
-
 // MARK: - Main ContentView
 
 struct ContentView: View {
@@ -20,7 +10,11 @@ struct ContentView: View {
     @State private var showProfile = false
     let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
 
-    let articles = [
+    // Add HomeViewModel to fetch RSS feed data
+    @StateObject private var homeViewModel = HomeViewModel()
+    
+    // Fallback articles in case RSS feed fails
+    let fallbackArticles = [
         ArticleItem(title: "Breaking News: Major Policy Change", image: "news1", date: "2 hours ago", source: "CNN"),
         ArticleItem(title: "Local Elections Update", image: "news2", date: "4 hours ago", source: "Fox News"),
         ArticleItem(title: "Community Meeting Highlights", image: "news3", date: "1 day ago", source: "ABC News")
@@ -49,18 +43,26 @@ struct ContentView: View {
                     // Main Content
                     ScrollView {
                         VStack(spacing: 20) {
-                            // News Carousel
-                            TabView(selection: $currentArticleIndex) {
-                                ForEach(0..<articles.count, id: \.self) { index in
-                                    NewsCard(article: articles[index])
-                                        .tag(index)
+                            // News Carousel - Now using RSS feed data
+                            if homeViewModel.isLoading {
+                                ProgressView("Loading news...")
+                                    .frame(height: 320)
+                            } else {
+                                let articlesToShow = !homeViewModel.carouselArticles.isEmpty ? 
+                                    homeViewModel.getCarouselItems() : fallbackArticles
+                                
+                                TabView(selection: $currentArticleIndex) {
+                                    ForEach(0..<articlesToShow.count, id: \.self) { index in
+                                        NewsCard(article: articlesToShow[index])
+                                            .tag(index)
+                                    }
                                 }
-                            }
-                            .frame(height: 320)
-                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-                            .onReceive(timer) { _ in
-                                withAnimation {
-                                    currentArticleIndex = (currentArticleIndex + 1) % articles.count
+                                .frame(height: 320)
+                                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+                                .onReceive(timer) { _ in
+                                    withAnimation {
+                                        currentArticleIndex = (currentArticleIndex + 1) % max(1, articlesToShow.count)
+                                    }
                                 }
                             }
 
@@ -144,6 +146,10 @@ struct ContentView: View {
                 VoterRegistrationView()
                     .environmentObject(rootMenuState)
             }
+            .fullScreenCover(isPresented: $rootMenuState.showingVoterRegistration) {
+                VoterRegistrationView()
+                    .environmentObject(rootMenuState)
+            }
             .fullScreenCover(isPresented: $rootMenuState.showingEvents) {
                 EventsView(isModal: true, onLogoTap: {
                     withAnimation {
@@ -168,6 +174,10 @@ struct ContentView: View {
                 BreakingNewsView()
                     .environmentObject(rootMenuState)
             }
+            .task {
+                // Fetch RSS feed data when the view appears
+                await homeViewModel.fetchCarouselNews()
+            }
         }
     }
 }
@@ -176,43 +186,86 @@ struct ContentView: View {
 
 struct NewsCard: View {
     let article: ArticleItem
+    @State private var showArticleDetail = false
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            Image(article.image)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
+        Button(action: {
+            showArticleDetail = true
+        }) {
+            ZStack(alignment: .bottomLeading) {
+                // Use URL or asset image
+                Group {
+                    if article.image.hasPrefix("http") {
+                        AsyncImage(url: URL(string: article.image)) { phase in
+                            switch phase {
+                            case .empty:
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .overlay(
+                                        Image(systemName: "newspaper")
+                                            .font(.system(size: 40))
+                                            .foregroundColor(.gray)
+                                    )
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            case .failure:
+                                Image(article.image.contains("/") ? "news1" : article.image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            @unknown default:
+                                Image(article.image.contains("/") ? "news1" : article.image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            }
+                        }
+                    } else {
+                        Image(article.image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    }
+                }
                 .frame(height: 200)
                 .clipped()
 
-            LinearGradient(
-                gradient: Gradient(colors: [.clear, .black.opacity(0.7)]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
+                LinearGradient(
+                    gradient: Gradient(colors: [.clear, .black.opacity(0.8)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(article.title)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .lineLimit(2)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(article.title)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.bottom, 2)
 
-                HStack(spacing: 4) {
-                    Text(article.source)
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.8))
-                    Text("•")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.8))
-                    Text(article.date)
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.8))
+                    HStack(spacing: 4) {
+                        Text(article.source)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.white.opacity(0.9))
+                        Text("•")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.8))
+                        Text(article.date)
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.9))
+                    }
                 }
+                .padding()
             }
-            .padding()
+            .cornerRadius(12)
+            .padding(.horizontal)
         }
-        .cornerRadius(12)
-        .padding(.horizontal)
+        .buttonStyle(PlainButtonStyle())
+        .sheet(isPresented: $showArticleDetail) {
+            ArticleDetailView(article: article)
+        }
     }
 }
 

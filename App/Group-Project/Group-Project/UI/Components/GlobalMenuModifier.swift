@@ -44,6 +44,14 @@ struct GlobalMenuModifier: ViewModifier {
             }
             
             if menuState.showingCalendar {
+                Group {
+                    #if DEBUG
+                    let _ = print("🔍 GlobalMenuModifier: Presenting ElectionCalendarView")
+                    let _ = print("   menuState ID: \(menuState.id)")
+                    let _ = print("   showingCalendar: \(menuState.showingCalendar)")
+                    #endif
+                }
+                
                 ElectionCalendarView(onLogoTap: {
                     withAnimation {
                         menuState.closeAllOverlays()
@@ -54,6 +62,14 @@ struct GlobalMenuModifier: ViewModifier {
             }
             
             if menuState.showingVoterRegistration {
+                Group {
+                    #if DEBUG
+                    let _ = print("🔍 GlobalMenuModifier: Presenting VoterRegistrationView")
+                    let _ = print("   menuState ID: \(menuState.id)")
+                    let _ = print("   showingVoterRegistration: \(menuState.showingVoterRegistration)")
+                    #endif
+                }
+                
                 VoterRegistrationView()
                     .environmentObject(menuState)
                     .zIndex(1000)

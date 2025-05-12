@@ -70,8 +70,13 @@ class BreakingNewsViewModel: ObservableObject {
             for (source, feed) in breakingNewsFeeds {
                 group.addTask {
                     let service = RSSService()
-                    await service.fetchRSS(from: feed)
-                    return (source, service.items)
+                    do {
+                        try await service.fetchRSS(from: feed)
+                        return (source, service.items)
+                    } catch {
+                        print("Error fetching \(source) feed: \(error)")
+                        return nil
+                    }
                 }
             }
             for await result in group {

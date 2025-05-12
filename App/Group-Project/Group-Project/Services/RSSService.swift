@@ -32,7 +32,7 @@ class RSSService: ObservableObject {
         case feedNotFound
     }
     
-    func fetchRSS(from urlString: String) async {
+    func fetchRSS(from urlString: String) async throws {
         await MainActor.run {
             isLoading = true
             error = nil
@@ -43,7 +43,7 @@ class RSSService: ObservableObject {
                 error = RSSError.invalidURL
                 isLoading = false
             }
-            return
+            throw RSSError.invalidURL
         }
         
         // Extract the source name from the URL
@@ -60,7 +60,7 @@ class RSSService: ObservableObject {
             }
             
             // Process feed and create items to return
-            let localItems = await processRSSFeed(result: result, sourceName: sourceName)
+            let localItems = try await processRSSFeed(result: result, sourceName: sourceName)
             
             // Update the published property on the main thread
             await MainActor.run {
@@ -73,10 +73,11 @@ class RSSService: ObservableObject {
                 self.error = error
                 self.isLoading = false
             }
+            throw error
         }
     }
     
-    private func processRSSFeed(result: Result<Feed, ParserError>, sourceName: String) async -> [RSSItem] {
+    private func processRSSFeed(result: Result<Feed, ParserError>, sourceName: String) async throws -> [RSSItem] {
         var processedItems: [RSSItem] = []
         
         switch result {
@@ -165,14 +166,14 @@ class RSSService: ObservableObject {
                 await MainActor.run {
                     error = RSSError.feedNotFound
                 }
-                return []
+                throw RSSError.feedNotFound
             }
         case .failure(let error):
             print("Feed parsing error: \(error)")
             await MainActor.run {
                 self.error = error
             }
-            return []
+            throw error
         }
         
         return processedItems

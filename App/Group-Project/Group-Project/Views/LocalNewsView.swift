@@ -9,6 +9,9 @@ struct LocalNewsView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottomTrailing) {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+                    
                 ScrollViewReader { scrollProxy in
                     ScrollView(showsIndicators: true) {
                         GeometryReader { geometry in
@@ -76,7 +79,7 @@ struct LocalNewsView: View {
                         }) {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.system(size: 40))
-                                .foregroundColor(.red.opacity(0.8))
+                                .foregroundColor(AppColors.red.opacity(0.8))
                                 .shadow(radius: 3)
                         }
                         .padding(.trailing, 20)
@@ -86,21 +89,32 @@ struct LocalNewsView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button(action: {
-                    withAnimation {
-                        menuState.closeAllOverlays()
-                    }
-                }) {
-                    Text("PolyWatch")
-                        .fontWeight(.bold)
-                },
-                trailing: Button("Close") {
-                    withAnimation {
-                        menuState.showingLocalNews = false
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        withAnimation {
+                            menuState.closeAllOverlays()
+                            #if DEBUG
+                            print("🏠 LocalNewsView: PolyWatch button tapped - returning to home screen")
+                            print("   menuState ID: \(menuState.id)")
+                            #endif
+                        }
+                    }) {
+                        Text("PolyWatch")
+                            .fontWeight(.bold)
+                            .foregroundColor(AppColors.red)
                     }
                 }
-            )
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Close") {
+                        withAnimation {
+                            menuState.showingLocalNews = false
+                        }
+                    }
+                    .foregroundColor(AppColors.blue)
+                }
+            }
             .task {
                 await viewModel.fetchLocalNews()
             }

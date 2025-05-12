@@ -88,11 +88,67 @@ class ElectionCalendarViewModel: NSObject, ObservableObject {
         let calendar = Calendar.current
         let year = calendar.component(.year, from: Date())
         var all: [CalendarEventItem] = []
+        all += nationalElections(for: year)
         all += stateElections(for: year)
         for city in CaliforniaCities.allCities {
             all += cityElections(for: city, in: year)
         }
         events = all.sorted { $0.date < $1.date }
+    }
+
+    private func nationalElections(for year: Int) -> [CalendarEventItem] {
+        let cal = Calendar.current
+        return [
+            CalendarEventItem(
+                title: "US Presidential Election",
+                date: cal.date(from: DateComponents(year: year, month: 11, day: 5))!,
+                description: "Election for President of the United States",
+                type: "National",
+                city: "United States",
+                details: ElectionDetails(
+                    registrationDeadline: cal.date(from: DateComponents(year: year, month: 10, day: 15))!,
+                    votingMethod: ["In-person", "Mail-in", "Early Voting"],
+                    pollingHours: "Varies by state",
+                    requirements: ["US Citizen", "18+ years", "Registered voter"],
+                    website: "https://www.usa.gov/voting",
+                    locations: [],
+                    importantDates: [
+                        ImportantDate(
+                            title: "Early Voting Begins",
+                            date: cal.date(from: DateComponents(year: year, month: 10, day: 19))!,
+                            description: "Early voting begins in many states"
+                        ),
+                        ImportantDate(
+                            title: "Election Day",
+                            date: cal.date(from: DateComponents(year: year, month: 11, day: 5))!,
+                            description: "National election day"
+                        )
+                    ]
+                )
+            ),
+            CalendarEventItem(
+                title: "US Congressional Midterm Elections",
+                date: cal.date(from: DateComponents(year: year + 2, month: 11, day: 3))!,
+                description: "Elections for the US House and Senate",
+                type: "National",
+                city: "United States",
+                details: ElectionDetails(
+                    registrationDeadline: cal.date(from: DateComponents(year: year + 2, month: 10, day: 15))!,
+                    votingMethod: ["In-person", "Mail-in", "Early Voting"],
+                    pollingHours: "Varies by state",
+                    requirements: ["US Citizen", "18+ years", "Registered voter"],
+                    website: "https://www.usa.gov/voting",
+                    locations: [],
+                    importantDates: [
+                        ImportantDate(
+                            title: "Early Voting Begins",
+                            date: cal.date(from: DateComponents(year: year + 2, month: 10, day: 19))!,
+                            description: "Early voting begins in many states"
+                        )
+                    ]
+                )
+            )
+        ]
     }
 
     private func stateElections(for year: Int) -> [CalendarEventItem] {
@@ -116,6 +172,11 @@ class ElectionCalendarViewModel: NSObject, ObservableObject {
                             title: "Registration Deadline",
                             date: cal.date(from: DateComponents(year: year, month: 2, day: 20))!,
                             description: "Last day to register"
+                        ),
+                        ImportantDate(
+                            title: "Mail Ballot Sent",
+                            date: cal.date(from: DateComponents(year: year, month: 2, day: 5))!,
+                            description: "Vote-by-mail ballots sent to voters"
                         )
                     ]
                 )
@@ -138,6 +199,38 @@ class ElectionCalendarViewModel: NSObject, ObservableObject {
                             title: "Registration Deadline",
                             date: cal.date(from: DateComponents(year: year, month: 10, day: 21))!,
                             description: "Last day to register"
+                        ),
+                        ImportantDate(
+                            title: "Mail Ballot Sent",
+                            date: cal.date(from: DateComponents(year: year, month: 10, day: 8))!,
+                            description: "Vote-by-mail ballots sent to voters"
+                        ),
+                        ImportantDate(
+                            title: "Early Voting Begins",
+                            date: cal.date(from: DateComponents(year: year, month: 10, day: 26))!,
+                            description: "Early voting period begins"
+                        )
+                    ]
+                )
+            ),
+            CalendarEventItem(
+                title: "California State Propositions",
+                date: cal.date(from: DateComponents(year: year, month: 11, day: 5))!,
+                description: "Statewide ballot measures",
+                type: "State",
+                city: "California",
+                details: ElectionDetails(
+                    registrationDeadline: cal.date(from: DateComponents(year: year, month: 10, day: 21))!,
+                    votingMethod: ["In-person", "Mail-in", "Early Voting"],
+                    pollingHours: "7:00 AM – 8:00 PM",
+                    requirements: ["Registered to vote", "18+ years", "California resident"],
+                    website: "https://voterguide.sos.ca.gov/",
+                    locations: [],
+                    importantDates: [
+                        ImportantDate(
+                            title: "Voter Guide Mailed",
+                            date: cal.date(from: DateComponents(year: year, month: 9, day: 25))!,
+                            description: "Official voter information guide mailed"
                         )
                     ]
                 )
@@ -169,12 +262,54 @@ class ElectionCalendarViewModel: NSObject, ObservableObject {
                                 type: "Polling Place",
                                 hours: "7:00 AM – 8:00 PM",
                                 accessibility: true
+                            ),
+                            VotingLocation(
+                                name: "Bill Graham Civic Auditorium",
+                                address: "99 Grove St, San Francisco",
+                                type: "Voting Center",
+                                hours: "8:00 AM – 5:00 PM",
+                                accessibility: true
                             )
                         ],
                         importantDates: [
                             ImportantDate(
                                 title: "Registration Deadline",
                                 date: cal.date(from: DateComponents(year: year, month: 5, day: 31))!,
+                                description: "Last day to register"
+                            ),
+                            ImportantDate(
+                                title: "Vote-by-Mail Begins",
+                                date: cal.date(from: DateComponents(year: year, month: 5, day: 15))!,
+                                description: "Ballots mailed to all registered voters"
+                            )
+                        ]
+                    )
+                ),
+                CalendarEventItem(
+                    title: "SF School Board Election",
+                    date: cal.date(from: DateComponents(year: year, month: 11, day: 5))!,
+                    description: "School Board Members & Education Measures",
+                    type: "Local",
+                    city: "San Francisco",
+                    details: ElectionDetails(
+                        registrationDeadline: cal.date(from: DateComponents(year: year, month: 10, day: 21))!,
+                        votingMethod: ["In-person", "Mail-in", "Early Voting"],
+                        pollingHours: "7:00 AM – 8:00 PM",
+                        requirements: ["Registered to vote", "18+ years", "SF resident"],
+                        website: "https://sfelections.sfgov.org",
+                        locations: [
+                            VotingLocation(
+                                name: "SF City Hall",
+                                address: "1 Dr. Carlton B. Goodlett Place",
+                                type: "Polling Place",
+                                hours: "7:00 AM – 8:00 PM",
+                                accessibility: true
+                            )
+                        ],
+                        importantDates: [
+                            ImportantDate(
+                                title: "Registration Deadline",
+                                date: cal.date(from: DateComponents(year: year, month: 10, day: 21))!,
                                 description: "Last day to register"
                             )
                         ]
@@ -202,12 +337,115 @@ class ElectionCalendarViewModel: NSObject, ObservableObject {
                                 type: "Polling Place",
                                 hours: "7:00 AM – 8:00 PM",
                                 accessibility: true
+                            ),
+                            VotingLocation(
+                                name: "Alameda County Courthouse",
+                                address: "1225 Fallon St, Oakland",
+                                type: "Voting Center",
+                                hours: "8:00 AM – 5:00 PM",
+                                accessibility: true
                             )
                         ],
                         importantDates: [
                             ImportantDate(
                                 title: "Registration Deadline",
                                 date: cal.date(from: DateComponents(year: year, month: 5, day: 20))!,
+                                description: "Last day to register"
+                            )
+                        ]
+                    )
+                ),
+                CalendarEventItem(
+                    title: "Oakland Mayoral Election",
+                    date: cal.date(from: DateComponents(year: year, month: 11, day: 5))!,
+                    description: "Election for Mayor of Oakland",
+                    type: "Local",
+                    city: "Oakland",
+                    details: ElectionDetails(
+                        registrationDeadline: cal.date(from: DateComponents(year: year, month: 10, day: 21))!,
+                        votingMethod: ["In-person", "Mail-in", "Early Voting"],
+                        pollingHours: "7:00 AM – 8:00 PM",
+                        requirements: ["Registered to vote", "18+ years", "Oakland resident"],
+                        website: "https://www.oaklandca.gov/topics/elections",
+                        locations: [
+                            VotingLocation(
+                                name: "Oakland City Hall",
+                                address: "1 Frank H. Ogawa Plaza",
+                                type: "Polling Place",
+                                hours: "7:00 AM – 8:00 PM",
+                                accessibility: true
+                            )
+                        ],
+                        importantDates: [
+                            ImportantDate(
+                                title: "Registration Deadline",
+                                date: cal.date(from: DateComponents(year: year, month: 10, day: 21))!,
+                                description: "Last day to register"
+                            )
+                        ]
+                    )
+                )
+            ]
+        case "San Jose":
+            return [
+                CalendarEventItem(
+                    title: "San Jose City Council Election",
+                    date: cal.date(from: DateComponents(year: year, month: 6, day: 7))!,
+                    description: "City Council & Local Measures",
+                    type: "Local",
+                    city: "San Jose",
+                    details: ElectionDetails(
+                        registrationDeadline: cal.date(from: DateComponents(year: year, month: 5, day: 23))!,
+                        votingMethod: ["In-person", "Mail-in", "Early Voting"],
+                        pollingHours: "7:00 AM – 8:00 PM",
+                        requirements: ["Registered to vote", "18+ years", "San Jose resident"],
+                        website: "https://www.sanjoseca.gov/your-government/departments/city-clerk/elections",
+                        locations: [
+                            VotingLocation(
+                                name: "San Jose City Hall",
+                                address: "200 East Santa Clara St",
+                                type: "Polling Place",
+                                hours: "7:00 AM – 8:00 PM",
+                                accessibility: true
+                            )
+                        ],
+                        importantDates: [
+                            ImportantDate(
+                                title: "Registration Deadline",
+                                date: cal.date(from: DateComponents(year: year, month: 5, day: 23))!,
+                                description: "Last day to register"
+                            )
+                        ]
+                    )
+                )
+            ]
+        case "Berkeley":
+            return [
+                CalendarEventItem(
+                    title: "Berkeley City Election",
+                    date: cal.date(from: DateComponents(year: year, month: 11, day: 5))!,
+                    description: "City Council & Local Measures",
+                    type: "Local",
+                    city: "Berkeley",
+                    details: ElectionDetails(
+                        registrationDeadline: cal.date(from: DateComponents(year: year, month: 10, day: 21))!,
+                        votingMethod: ["In-person", "Mail-in", "Early Voting"],
+                        pollingHours: "7:00 AM – 8:00 PM",
+                        requirements: ["Registered to vote", "18+ years", "Berkeley resident"],
+                        website: "https://www.cityofberkeley.info/Clerk/Elections/Elections.aspx",
+                        locations: [
+                            VotingLocation(
+                                name: "Berkeley Civic Center",
+                                address: "2180 Milvia St",
+                                type: "Polling Place",
+                                hours: "7:00 AM – 8:00 PM",
+                                accessibility: true
+                            )
+                        ],
+                        importantDates: [
+                            ImportantDate(
+                                title: "Registration Deadline",
+                                date: cal.date(from: DateComponents(year: year, month: 10, day: 21))!,
                                 description: "Last day to register"
                             )
                         ]
@@ -275,13 +513,86 @@ struct ElectionCalendarView: View {
                 Color(.systemBackground)
                     .ignoresSafeArea()
 
-                VStack(spacing: 0) {
+                VStack(spacing: 16) {
                     TopBarView(
                         onMenuTap: { withAnimation { menuState.isShowing = true } },
-                        onLogoTap: onLogoTap,
+                        onLogoTap: {
+                            withAnimation {
+                                menuState.closeAllOverlays()
+                                #if DEBUG
+                                print("🏠 ElectionCalendarView: PolyWatch button tapped - returning to home screen")
+                                print("   menuState ID: \(menuState.id)")
+                                #endif
+                            }
+                        },
                         onSearchTap: {}
                     )
-                    // TODO: Insert your calendar header, grid, etc. here
+                    
+                    // Calendar header
+                    VStack(spacing: 8) {
+                        Text("Election Calendar")
+                            .font(.system(size: 28, weight: .bold))
+                            .padding(.top, 8)
+                        
+                        HStack {
+                            Button(action: { viewModel.moveMonth(by: -1) }) {
+                                Image(systemName: "chevron.left")
+                                    .foregroundColor(AppColors.blue)
+                                    .padding()
+                            }
+                            
+                            Spacer()
+                            
+                            Text(viewModel.selectedDate.formatted(.dateTime.month(.wide).year()))
+                                .font(.headline)
+                            
+                            Spacer()
+                            
+                            Button(action: { viewModel.moveMonth(by: 1) }) {
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(AppColors.blue)
+                                    .padding()
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    
+                    // Calendar grid
+                    CalendarGrid(
+                        selectedDate: $viewModel.selectedDate,
+                        events: viewModel.filteredEvents,
+                        userLocation: viewModel.userLocation
+                    )
+                    
+                    // Events list for selected date
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Events on \(viewModel.selectedDate.formatted(.dateTime.month().day().weekday()))")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            
+                            if viewModel.filteredEvents.isEmpty {
+                                VStack(spacing: 12) {
+                                    Image(systemName: "calendar.badge.exclamationmark")
+                                        .font(.system(size: 40))
+                                        .foregroundColor(.gray)
+                                    Text("No events scheduled for this date")
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                            } else {
+                                LazyVStack(spacing: 12) {
+                                    ForEach(viewModel.filteredEvents) { event in
+                                        ElectionEventCard(event: event)
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                        .padding(.bottom, 20)
+                    }
                 }
 
                 if menuState.isShowing {
@@ -302,24 +613,28 @@ struct ElectionCalendarView: View {
                     .zIndex(2)
                 }
             }
-            .navigationBarItems(
-                leading: HStack {
-                    Button(action: {
-                        withAnimation {
-                            menuState.closeAllOverlays()
+            .navigationBarHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    HStack {
+                        Button(action: {
+                            withAnimation {
+                                menuState.closeAllOverlays()
+                            }
+                        }) {
+                            Text("PolyWatch")
+                                .fontWeight(.bold)
+                                .foregroundColor(AppColors.red)
                         }
-                    }) {
-                        Text("PolyWatch")
-                            .fontWeight(.bold)
-                    }
-                    Button("Close") {
-                        withAnimation {
-                            menuState.showingCalendar = false
+                        Button("Close") {
+                            withAnimation {
+                                menuState.showingCalendar = false
+                            }
                         }
+                        .foregroundColor(AppColors.blue)
                     }
                 }
-            )
-            .navigationBarHidden(true)
+            }
         }
     }
 }
@@ -392,7 +707,7 @@ struct DayCell: View {
             VStack(spacing: 4) {
                 Text("\(Calendar.current.component(.day, from: date))")
                     .font(.system(size:16))
-                    .foregroundColor(isSelected ? .white : (isToday ? .red : .primary))
+                    .foregroundColor(isSelected ? .white : (isToday ? AppColors.red : .primary))
                 if !events.isEmpty {
                     HStack(spacing:2) {
                         ForEach(events.prefix(3)) { _ in
@@ -405,9 +720,9 @@ struct DayCell: View {
             .background(
                 Group {
                     if isSelected {
-                        Circle().fill(Color.red)
+                        Circle().fill(AppColors.red)
                     } else if isToday {
-                        Circle().stroke(Color.red, lineWidth:1)
+                        Circle().stroke(AppColors.red, lineWidth:1)
                     }
                 }
             )
@@ -416,9 +731,295 @@ struct DayCell: View {
 
     private var eventColor: Color {
         guard let first = events.first else { return .green }
-        if first.type == "State" { return .blue }
+        if first.type == "State" { return AppColors.blue }
         else if first.city == userLocation { return .orange }
         else { return .green }
+    }
+}
+
+// MARK: - Event Card
+
+struct ElectionEventCard: View {
+    let event: CalendarEventItem
+    @State private var showingDetails = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Title
+            Text(event.title)
+                .font(.headline)
+                .foregroundColor(.black)
+            
+            // Location and Time in a single row
+            HStack(spacing: 16) {
+                // Location
+                HStack(spacing: 6) {
+                    Image(systemName: "mappin.circle.fill")
+                        .foregroundColor(.red)
+                        .font(.system(size: 16))
+                    Text(event.city)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer(minLength: 4)
+                
+                // Time
+                HStack(spacing: 6) {
+                    Image(systemName: "clock.fill")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 16))
+                    Text(event.date.formatted(.dateTime.hour().minute()))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            // Description
+            Text(event.description)
+                .font(.body)
+                .foregroundColor(.secondary)
+                .lineLimit(2)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .onTapGesture {
+            showingDetails = true
+        }
+        .sheet(isPresented: $showingDetails) {
+            CalendarEventDetailView(event: event)
+        }
+    }
+}
+
+// MARK: - Event Detail View
+
+struct CalendarEventDetailView: View {
+    let event: CalendarEventItem
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    // Header section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(event.title)
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                        
+                        HStack(spacing: 12) {
+                            Label(event.city, systemImage: "mappin.circle.fill")
+                                .foregroundColor(.secondary)
+                            
+                            Divider()
+                                .frame(height: 16)
+                            
+                            Label(event.date.formatted(.dateTime.month().day().year()), systemImage: "calendar")
+                                .foregroundColor(.secondary)
+                        }
+                        .font(.subheadline)
+                    }
+                    .padding(.bottom, 8)
+                    
+                    // Description
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("About")
+                            .font(.headline)
+                        
+                        Text(event.description)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Divider()
+                    
+                    // Registration Deadline
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Registration Deadline")
+                            .font(.headline)
+                        
+                        HStack {
+                            Image(systemName: "calendar.badge.clock")
+                                .foregroundColor(.red)
+                            Text(event.details.registrationDeadline.formatted(date: .long, time: .omitted))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    Divider()
+                    
+                    // Voting Methods
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Voting Methods")
+                            .font(.headline)
+                        
+                        ForEach(event.details.votingMethod, id: \.self) { method in
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                    .font(.system(size: 14))
+                                Text(method)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    
+                    Divider()
+                    
+                    // Polling Hours
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Polling Hours")
+                            .font(.headline)
+                        
+                        HStack {
+                            Image(systemName: "clock.fill")
+                                .foregroundColor(.blue)
+                            Text(event.details.pollingHours)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    Divider()
+                    
+                    // Requirements
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Requirements")
+                            .font(.headline)
+                        
+                        ForEach(event.details.requirements, id: \.self) { requirement in
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: "circle.fill")
+                                    .foregroundColor(.blue)
+                                    .font(.system(size: 6))
+                                    .padding(.top, 6)
+                                Text(requirement)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    
+                    // Important Dates
+                    if !event.details.importantDates.isEmpty {
+                        Divider()
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Important Dates")
+                                .font(.headline)
+                            
+                            ForEach(event.details.importantDates) { date in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(date.title)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                    
+                                    HStack {
+                                        Image(systemName: "calendar")
+                                            .foregroundColor(.orange)
+                                        Text(date.date.formatted(date: .long, time: .omitted))
+                                            .foregroundColor(.secondary)
+                                            .font(.subheadline)
+                                    }
+                                    
+                                    if !date.description.isEmpty {
+                                        Text(date.description)
+                                            .font(.footnote)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        }
+                    }
+                    
+                    // Voting Locations
+                    if !event.details.locations.isEmpty {
+                        Divider()
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Voting Locations")
+                                .font(.headline)
+                            
+                            ForEach(event.details.locations) { location in
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(location.name)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                    
+                                    HStack(alignment: .top) {
+                                        Image(systemName: "mappin")
+                                            .foregroundColor(.red)
+                                            .frame(width: 20)
+                                        Text(location.address)
+                                            .font(.footnote)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    HStack {
+                                        Image(systemName: "clock")
+                                            .foregroundColor(.blue)
+                                            .frame(width: 20)
+                                        Text(location.hours)
+                                            .font(.footnote)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    HStack {
+                                        Image(systemName: "info.circle")
+                                            .foregroundColor(.gray)
+                                            .frame(width: 20)
+                                        Text(location.type)
+                                            .font(.footnote)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    if location.accessibility {
+                                        HStack {
+                                            Image(systemName: "figure.roll")
+                                                .foregroundColor(.blue)
+                                                .frame(width: 20)
+                                            Text("Accessible")
+                                                .font(.footnote)
+                                                .foregroundColor(.secondary)
+                                        }
+                                    }
+                                }
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 12)
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(8)
+                            }
+                        }
+                    }
+                    
+                    // Website Link
+                    Divider()
+                    
+                    Button(action: {
+                        if let url = URL(string: event.details.website) {
+                            UIApplication.shared.open(url)
+                        }
+                    }) {
+                        HStack {
+                            Text("Visit Official Website")
+                            Spacer()
+                            Image(systemName: "arrow.up.right.square")
+                        }
+                        .foregroundColor(.blue)
+                        .padding()
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+                }
+                .padding()
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button("Close") {
+                dismiss()
+            })
+        }
     }
 }
 
@@ -450,8 +1051,11 @@ struct DateRow: View {
 
 struct CaliforniaCities {
     static let allCities = [
-        "San Francisco","Oakland","San Jose","Berkeley","Palo Alto",
-        "Mountain View","Santa Clara","Fremont","Hayward","Richmond"
+        "San Francisco", "Oakland", "San Jose", "Berkeley", "Palo Alto",
+        "Mountain View", "Santa Clara", "Fremont", "Hayward", "Richmond",
+        "Daly City", "South San Francisco", "San Mateo", "Redwood City", "Sunnyvale",
+        "Cupertino", "Milpitas", "Alameda", "San Rafael", "Walnut Creek",
+        "Concord", "Pleasanton", "Livermore", "Dublin", "San Ramon"
     ]
 }
 

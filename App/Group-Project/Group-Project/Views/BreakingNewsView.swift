@@ -7,6 +7,9 @@ struct BreakingNewsView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottomTrailing) {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+                    
                 ScrollView {
                     VStack(spacing: 24) {
                         // Header
@@ -46,21 +49,32 @@ struct BreakingNewsView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button(action: {
-                    withAnimation {
-                        menuState.closeAllOverlays()
-                    }
-                }) {
-                    Text("PolyWatch")
-                        .fontWeight(.bold)
-                },
-                trailing: Button("Close") {
-                    withAnimation {
-                        menuState.showingBreakingNews = false
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        withAnimation {
+                            menuState.closeAllOverlays()
+                            #if DEBUG
+                            print("🏠 BreakingNewsView: PolyWatch button tapped - returning to home screen")
+                            print("   menuState ID: \(menuState.id)")
+                            #endif
+                        }
+                    }) {
+                        Text("PolyWatch")
+                            .fontWeight(.bold)
+                            .foregroundColor(AppColors.red)
                     }
                 }
-            )
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Close") {
+                        withAnimation {
+                            menuState.showingBreakingNews = false
+                        }
+                    }
+                    .foregroundColor(AppColors.blue)
+                }
+            }
             .task {
                 await viewModel.fetchBreakingNews()
             }
