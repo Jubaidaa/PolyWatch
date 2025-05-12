@@ -55,7 +55,15 @@ struct VoterRegistrationView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         withAnimation {
-                            menuState.showingHelp = true
+                            // First dismiss this view
+                            menuState.showingVoterRegistration = false
+                            
+                            // Then show the help view
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation {
+                                    menuState.showingHelp = true
+                                }
+                            }
                         }
                     } label: {
                         Image(systemName: "questionmark.circle")
