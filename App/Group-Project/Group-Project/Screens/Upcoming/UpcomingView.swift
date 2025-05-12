@@ -36,7 +36,11 @@ struct UpcomingView: View {
                             menuState.returnToMainView()
                         }
                     },
-                    onSearchTap: {}
+                    onSearchTap: {},
+                    showBackButton: true,
+                    onBackTap: {
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 )
                 
                 // You could insert a picker here to toggle selectedView between .list and .calendar
