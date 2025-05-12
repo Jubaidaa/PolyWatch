@@ -76,7 +76,7 @@ struct GlobalMenuModifier: ViewModifier {
             }
             
             if menuState.showingHelp {
-                VoterRegistrationView()
+                HelpView()
                     .environmentObject(menuState)
                     .zIndex(1000)
             }

@@ -8,10 +8,6 @@ struct VoterRegistrationView: View {
     
     enum InfoSection: String, CaseIterable {
         case registration = "Register"
-        case requirements = "Require..."
-        case deadlines = "Key Dates"
-        case rights = "Rights"
-        case resources = "Resources"
     }
     
     struct DetailInfo: Identifiable {
@@ -39,30 +35,8 @@ struct VoterRegistrationView: View {
                         }
                         .padding(.top)
                         
-                        // Section Picker
-                        Picker("Section", selection: $selectedSection) {
-                            ForEach(InfoSection.allCases, id: \.self) { section in
-                                Text(section.rawValue)
-                                    .font(.system(size: 13))
-                                    .tag(section)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .padding(.horizontal, Constants.Padding.standard)
-                        
-                        // Content based on selected section
-                        switch selectedSection {
-                        case .registration:
-                            registrationSection
-                        case .requirements:
-                            requirementsSection
-                        case .deadlines:
-                            deadlinesSection
-                        case .rights:
-                            rightsSection
-                        case .resources:
-                            resourcesSection
-                        }
+                        // Just show the registration section directly since it's the only tab now
+                        registrationSection
                     }
                 }
             }
@@ -79,12 +53,15 @@ struct VoterRegistrationView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Get Help") {
+                    Button {
                         withAnimation {
                             menuState.showingHelp = true
                         }
+                    } label: {
+                        Image(systemName: "questionmark.circle")
+                            .font(.system(size: 22))
+                            .foregroundColor(AppColors.blue)
                     }
-                    .foregroundColor(AppColors.blue)
                 }
             }
             .sheet(item: $selectedDetail) { detail in
@@ -238,156 +215,6 @@ struct VoterRegistrationView: View {
                 },
                 actionText: "Check Now",
                 showsDetailIndicator: true
-            )
-        }
-        .padding()
-    }
-    
-    private var requirementsSection: some View {
-        VStack(spacing: 16) {
-            InfoCard(
-                title: "Basic Requirements",
-                description: "To register to vote in California, you must be:\n• A United States citizen\n• A resident of California\n• 18 years or older on Election Day\n• Not currently serving a state or federal prison term for a felony conviction\n• Not currently found mentally incompetent by a court",
-                action: nil,
-                actionText: nil
-            )
-            
-            InfoCard(
-                title: "Pre-Registration for Youth",
-                description: "If you're 16 or 17 years old, you can pre-register to vote. You'll automatically be registered to vote on your 18th birthday.",
-                action: {
-                    if let url = URL(string: "https://www.sos.ca.gov/elections/pre-register-16-vote-18") {
-                        UIApplication.shared.open(url)
-                    }
-                },
-                actionText: "Pre-Register"
-            )
-            
-            InfoCard(
-                title: "ID Requirements",
-                description: "First-time voters who registered online or by mail may need to show ID when voting. Acceptable forms include:\n• CA driver's license\n• Passport\n• Student ID\n• Military ID\n• Utility bill\n• Bank statement",
-                action: nil,
-                actionText: nil
-            )
-        }
-        .padding()
-    }
-    
-    private var deadlinesSection: some View {
-        VStack(spacing: 16) {
-            InfoCard(
-                title: "Registration Deadlines",
-                description: "• Regular registration: 15 days before Election Day\n• Same-day registration: Available through Election Day\n• Mail ballot request: 7 days before Election Day\n• Mail ballot return: Postmarked by Election Day and received within 7 days",
-                action: nil,
-                actionText: nil
-            )
-            
-            InfoCard(
-                title: "2024 Election Calendar",
-                description: "Primary Election:\n• Election Day: March 5, 2024\n• Registration Deadline: February 20, 2024\n\nGeneral Election:\n• Election Day: November 5, 2024\n• Registration Deadline: October 21, 2024",
-                action: nil,
-                actionText: nil
-            )
-            
-            InfoCard(
-                title: "Early Voting",
-                description: "Early voting locations open 10 days before Election Day. Some counties offer even earlier voting options.",
-                action: {
-                    if let url = URL(string: "https://caearlyvoting.sos.ca.gov/") {
-                        UIApplication.shared.open(url)
-                    }
-                },
-                actionText: "Find Early Voting"
-            )
-        }
-        .padding()
-    }
-    
-    private var rightsSection: some View {
-        VStack(spacing: 16) {
-            InfoCard(
-                title: "Your Voting Rights",
-                description: "As a California voter, you have the right to:\n• Cast your ballot privately and independently\n• Receive voting materials in your preferred language\n• Get help casting your ballot\n• Drop off your completed ballot at any polling place\n• Get a new ballot if you make a mistake\n• Vote if you're in line when polls close\n• Vote by mail\n• Report any illegal or fraudulent election activity",
-                action: nil,
-                actionText: nil
-            )
-            
-            InfoCard(
-                title: "Language Access",
-                description: "Voting materials are available in:\n• English\n• Spanish\n• Chinese\n• Hindi\n• Japanese\n• Khmer\n• Korean\n• Tagalog\n• Thai\n• Vietnamese",
-                action: {
-                    if let url = URL(string: "https://www.sos.ca.gov/elections/voting-resources/language-requirements") {
-                        UIApplication.shared.open(url)
-                    }
-                },
-                actionText: "Language Resources"
-            )
-            
-            InfoCard(
-                title: "Accessible Voting",
-                description: "Every polling place offers:\n• Accessible voting machines\n• Curbside voting\n• Physical accessibility\n• Voting assistance\n• Remote accessible vote-by-mail",
-                action: {
-                    if let url = URL(string: "https://www.sos.ca.gov/elections/voting-resources/voters-disabilities") {
-                        UIApplication.shared.open(url)
-                    }
-                },
-                actionText: "Learn More"
-            )
-        }
-        .padding()
-    }
-    
-    private var resourcesSection: some View {
-        VStack(spacing: 16) {
-            InfoCard(
-                title: "Voter Information Guide",
-                description: "Access the official guide with information about candidates and ballot measures.",
-                action: {
-                    if let url = URL(string: "https://voterguide.sos.ca.gov/") {
-                        UIApplication.shared.open(url)
-                    }
-                },
-                actionText: "View Guide"
-            )
-            
-            InfoCard(
-                title: "Track Your Ballot",
-                description: "Sign up for automatic updates about your ballot's status via email, text, or voice call.",
-                action: {
-                    if let url = URL(string: "https://california.ballottrax.net/voter/") {
-                        UIApplication.shared.open(url)
-                    }
-                },
-                actionText: "Track Ballot"
-            )
-            
-            InfoCard(
-                title: "County Elections Offices",
-                description: "Contact your local elections office for specific questions about voting in your county.",
-                action: {
-                    if let url = URL(string: "https://www.sos.ca.gov/elections/voting-resources/county-elections-offices") {
-                        UIApplication.shared.open(url)
-                    }
-                },
-                actionText: "Find Office"
-            )
-            
-            InfoCard(
-                title: "Report Issues",
-                description: "Report voting problems or voter intimidation:\n• Voter Hotline: (800) 345-VOTE (8683)\n• Election cybersecurity issues: VoteSure@sos.ca.gov",
-                action: nil,
-                actionText: nil
-            )
-            
-            InfoCard(
-                title: "Additional Resources",
-                description: "• League of Women Voters\n• California Secretary of State\n• County Registrar of Voters\n• National Voter Registration Application",
-                action: {
-                    if let url = URL(string: "https://www.sos.ca.gov/elections/voting-resources/") {
-                        UIApplication.shared.open(url)
-                    }
-                },
-                actionText: "More Resources"
             )
         }
         .padding()
