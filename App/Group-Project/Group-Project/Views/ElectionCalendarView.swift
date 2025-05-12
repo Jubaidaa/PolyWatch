@@ -506,6 +506,7 @@ struct ElectionCalendarView: View {
     @StateObject private var viewModel = ElectionCalendarViewModel()
     @EnvironmentObject private var menuState: MenuState
     let onLogoTap: () -> Void
+    var showTopBar: Bool = true
 
     var body: some View {
         NavigationView {
@@ -514,15 +515,17 @@ struct ElectionCalendarView: View {
                     .ignoresSafeArea()
 
                 VStack(spacing: 16) {
-                    TopBarView(
-                        onMenuTap: { withAnimation { menuState.isShowing = true } },
-                        onLogoTap: {
-                            withAnimation {
-                                menuState.returnToMainView()
-                            }
-                        },
-                        onSearchTap: {}
-                    )
+                    if showTopBar {
+                        TopBarView(
+                            onMenuTap: { withAnimation { menuState.isShowing = true } },
+                            onLogoTap: {
+                                withAnimation {
+                                    menuState.returnToMainView()
+                                }
+                            },
+                            onSearchTap: {}
+                        )
+                    }
                     
                     // Calendar header
                     VStack(spacing: 8) {
