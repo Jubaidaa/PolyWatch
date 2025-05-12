@@ -5,7 +5,7 @@ struct UpcomingView: View {
     @StateObject private var stateManager = StateManager()
     @Environment(\.presentationMode) var presentationMode
     @State private var showVoterRegistration = false
-    @State private var selectedView: ViewType = .list
+    @State private var selectedView: ViewType = .calendar
     @EnvironmentObject private var menuState: MenuState
     let onLogoTap: () -> Void
     
