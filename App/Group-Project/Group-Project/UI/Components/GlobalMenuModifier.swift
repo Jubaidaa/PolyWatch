@@ -102,11 +102,7 @@ struct GlobalMenuModifier: ViewModifier {
             }
             
             if menuState.showingEvents {
-                EventsView(isModal: true, onLogoTap: {
-                    withAnimation {
-                        menuState.closeAllOverlays()
-                    }
-                })
+                EventsView(isModal: true)
                     .environmentObject(menuState)
                     .zIndex(1000)
             }

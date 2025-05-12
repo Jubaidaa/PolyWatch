@@ -287,61 +287,6 @@ private struct FilterButton: View {
     }
 }
 
-// For event card preview
-struct EventCard: View {
-    let event: Event
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Title
-            Text(event.title)
-                .font(.headline)
-                .lineLimit(2)
-            
-            // Date
-            HStack {
-                Image(systemName: "calendar")
-                    .foregroundColor(.blue)
-                Text(event.shortFormattedDate)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
-            
-            // Location
-            HStack {
-                Image(systemName: "mappin.and.ellipse")
-                    .foregroundColor(.red)
-                Text(event.location)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                    .lineLimit(1)
-            }
-            
-            // Tags
-            if !event.tags.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(event.tags.prefix(3), id: \.self) { tag in
-                            Text(tag)
-                                .font(.caption)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.blue.opacity(0.1))
-                                .foregroundColor(.blue)
-                                .cornerRadius(4)
-                        }
-                    }
-                }
-            }
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.white)
-        .cornerRadius(8)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-    }
-}
-
 struct EventsView_Previews: PreviewProvider {
     static var previews: some View {
         EventsView(isModal: false)
