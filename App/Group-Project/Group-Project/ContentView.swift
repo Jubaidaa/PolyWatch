@@ -199,6 +199,11 @@ struct ContentView: View {
                 // Fetch RSS feed data when the view appears
                 await homeViewModel.fetchCarouselNews()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .returnToMainView)) { _ in
+                withAnimation {
+                    selectedTab = 0
+                }
+            }
         }
     }
 }
