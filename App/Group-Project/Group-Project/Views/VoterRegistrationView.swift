@@ -69,28 +69,22 @@ struct VoterRegistrationView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    HStack {
-                        Button(action: {
-                            withAnimation {
-                                menuState.closeAllOverlays()
-                                #if DEBUG
-                                print("🏠 VoterRegistrationView: PolyWatch button tapped - returning to home screen")
-                                print("   menuState ID: \(menuState.id)")
-                                #endif
-                            }
-                        }) {
-                            Text("PolyWatch")
-                                .fontWeight(.bold)
-                                .foregroundColor(AppColors.red)
+                    Button("Close") {
+                        withAnimation {
+                            menuState.showingVoterRegistration = false
+                            menuState.showingHelp = false
                         }
-                        
-                        Button("Close") {
-                            withAnimation {
-                                menuState.showingVoterRegistration = false
-                            }
-                        }
-                        .foregroundColor(AppColors.blue)
                     }
+                    .foregroundColor(AppColors.blue)
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Get Help") {
+                        withAnimation {
+                            menuState.showingHelp = true
+                        }
+                    }
+                    .foregroundColor(AppColors.blue)
                 }
             }
             .sheet(item: $selectedDetail) { detail in
