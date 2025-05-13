@@ -67,6 +67,15 @@ struct NewsView: View {
 struct NewsItemView: View {
     let item: RSSItem
     
+    // Assign a color based on the source name for visual variety
+    private func colorForSource(_ source: String) -> Color {
+        let colors: [Color] = [
+            .red, .blue, .green, .orange, .purple, .pink, .teal, .indigo
+        ]
+        let hash = abs(source.hashValue)
+        return colors[hash % colors.count]
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let imageUrl = item.imageUrl {
@@ -82,6 +91,19 @@ struct NewsItemView: View {
                         .frame(height: 200)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
+            }
+            
+            // Source badge
+            if !item.source.isEmpty {
+                Text(item.source.uppercased())
+                    .font(.caption2.bold())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(colorForSource(item.source).opacity(0.15))
+                    )
+                    .foregroundColor(colorForSource(item.source).opacity(0.9))
             }
             
             VStack(alignment: .leading, spacing: 8) {
@@ -108,6 +130,7 @@ struct NewsItemView: View {
                             UIApplication.shared.open(url)
                         }
                         .font(.caption.bold())
+                        .foregroundColor(colorForSource(item.source))
                     }
                 }
             }
@@ -117,7 +140,7 @@ struct NewsItemView: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 2)
+                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 2)
         )
         .contentShape(Rectangle())
         .onTapGesture {

@@ -1,25 +1,46 @@
 import SwiftUI
 
 struct MainView: View {
-    @StateObject private var menuState = MenuState()
-    
+    @ObservedObject var menuState: MenuState
+    @State private var selectedTab = 0
+
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Label("Home", systemImage: "house.fill")
-                }
+        TabView(selection: $selectedTab) {
+            HomeView(
+                onLogoTap: { selectedTab = 0 }
+            )
+            .tabItem {
+                Label("Home", systemImage: "house.fill")
+            }
+            .tag(0)
             
-            EventsView(isModal: false)
-                .tabItem {
-                    Label("Events", systemImage: "star.fill")
-                }
+            EventsView(
+                isModal: false
+            )
+            .tabItem {
+                Label("Events", systemImage: "star.fill")
+            }
+            .tag(1)
         }
         .tabViewStyle(.page)
         .environmentObject(menuState)
+        .withGlobalMenu(menuState: menuState, onLogoTap: {
+            withAnimation {
+                menuState.closeAllOverlays()
+                selectedTab = 0
+            }
+        })
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("returnToMainView"))) { _ in
+            withAnimation {
+                selectedTab = 0
+            }
+        }
     }
 }
 
-#Preview {
-    MainView()
-} 
+struct MainView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainView(menuState: MenuState())
+    }
+}
+

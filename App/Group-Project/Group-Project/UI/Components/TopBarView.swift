@@ -4,28 +4,45 @@ struct TopBarView: View {
     let onMenuTap: () -> Void
     let onLogoTap: () -> Void
     let onSearchTap: () -> Void
+    var showBackButton: Bool = false
+    var onBackTap: (() -> Void)? = nil
     @EnvironmentObject private var menuState: MenuState
     
     var body: some View {
         ZStack {
             // Main content
             HStack {
-                // Menu Button
-                Button(action: {
-                    withAnimation {
-                        menuState.isShowing = true
+                // Back Button or Menu Button
+                if showBackButton {
+                    Button(action: {
+                        onBackTap?()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: Constants.Dimensions.iconSize))
+                            .foregroundColor(AppColors.TopBar.icons)
+                            .accessibilityLabel("Back")
                     }
-                }) {
-                    Image(systemName: "line.3.horizontal")
-                        .font(.system(size: Constants.Dimensions.iconSize))
-                        .foregroundColor(AppColors.TopBar.icons)
-                        .accessibilityLabel("Menu")
+                } else {
+                    Button(action: {
+                        withAnimation {
+                            menuState.isShowing = true
+                        }
+                    }) {
+                        Image(systemName: "line.3.horizontal")
+                            .font(.system(size: Constants.Dimensions.iconSize))
+                            .foregroundColor(AppColors.TopBar.icons)
+                            .accessibilityLabel("Menu")
+                    }
                 }
                 
                 Spacer()
                 
                 // Center logo
-                Button(action: onLogoTap) {
+                Button(action: {
+                    withAnimation {
+                        menuState.closeAllOverlays()
+                    }
+                }) {
                     Image("sideicon")
                         .resizable()
                         .scaledToFit()
@@ -36,12 +53,12 @@ struct TopBarView: View {
                 
                 Spacer()
                 
-                // Search icon
+                // Profile icon
                 Button(action: onSearchTap) {
-                    Image(systemName: "magnifyingglass")
+                    Image(systemName: "person.circle.fill")
                         .font(.system(size: Constants.Dimensions.iconSize))
                         .foregroundColor(AppColors.TopBar.icons)
-                        .accessibilityLabel("Search")
+                        .accessibilityLabel("Profile")
                 }
             }
             .padding(.horizontal, Constants.Padding.standard)
