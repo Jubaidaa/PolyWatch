@@ -84,7 +84,7 @@ struct GlobalMenuModifier: ViewModifier {
                     #endif
                 }
                 
-                HelpSidebarView()
+                HelpView()
                     .environmentObject(menuState)
                     .zIndex(1000)
             }
