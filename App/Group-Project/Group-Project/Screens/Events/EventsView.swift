@@ -5,6 +5,8 @@ struct EventsView: View {
     @StateObject private var viewModel = EventsViewModel()
     @State private var searchText = ""
     @State private var selectedFilter: FilterType = .all
+    @Environment(\.presentationMode) private var presentationMode
+    @EnvironmentObject private var menuState: MenuState
     
     enum FilterType: String, CaseIterable, Identifiable {
         case all = "All"
@@ -19,11 +21,15 @@ struct EventsView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Top Bar
+            // Top Bar with custom back arrow
             TopBarView(
                 onMenuTap: {},
                 onLogoTap: {},
-                onSearchTap: {}
+                onSearchTap: {},
+                showBackButton: true,
+                onBackTap: {
+                    presentationMode.wrappedValue.dismiss()
+                }
             )
             
             // Search Bar
@@ -67,6 +73,7 @@ struct EventsView: View {
                 Task { await viewModel.loadEvents() }
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
     
     // MARK: - Filtering Logic
