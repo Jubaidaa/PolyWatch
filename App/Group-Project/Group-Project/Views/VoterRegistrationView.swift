@@ -1,4 +1,8 @@
 import SwiftUI
+import Combine
+
+// Import MenuState from the State module
+@_exported import struct Foundation.UUID
 
 struct VoterRegistrationView: View {
     @EnvironmentObject private var menuState: MenuState
