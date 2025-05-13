@@ -1,7 +1,7 @@
 import SwiftUI
-import Foundation
+import Combine
 
-// Add explicit import for MenuState
+// Import MenuState from the State module
 @_exported import struct Foundation.UUID
 
 struct VoterRegistrationView: View {

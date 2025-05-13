@@ -1,54 +1,39 @@
 import SwiftUI
-import Foundation
+import Combine
 
-// Add explicit import for MenuState
+// Import MenuState from the State module
 @_exported import struct Foundation.UUID
 
 struct WithSidebarMenu<Content: View>: View {
-    @EnvironmentObject private var menuState: MenuState
-    let content: () -> Content
+    @StateObject private var menuState = MenuState()
+    let content: Content
     let onLogoTap: () -> Void
 
-    init(onLogoTap: @escaping () -> Void = {}, @ViewBuilder content: @escaping () -> Content) {
+    init(@ViewBuilder content: () -> Content, onLogoTap: @escaping () -> Void) {
+        self.content = content()
         self.onLogoTap = onLogoTap
-        self.content = content
     }
 
     var body: some View {
-        let _: CGFloat = 320
-        ZStack(alignment: .leading) {
-            VStack(spacing: 0) {
-                TopBarView(
-                    onMenuTap: {
-                        withAnimation {
-                            menuState.isShowing = true
-                        }
-                    },
-                    onLogoTap: onLogoTap,
-                    onSearchTap: {}
-                )
-                content()
-            }
+        ZStack {
+            content
+                .environmentObject(menuState)
+
             if menuState.isShowing {
-                Color.black.opacity(0.4)
+                Color.black.opacity(0.3)
                     .ignoresSafeArea()
                     .onTapGesture {
                         withAnimation {
                             menuState.isShowing = false
                         }
                     }
-                    .zIndex(1)
-            }
-            if menuState.isShowing {
-                VStack {
+
+                HStack {
                     SidebarMenuContent(onLogoTap: onLogoTap)
                         .environmentObject(menuState)
-                        .frame(maxWidth: 320)
-                        .padding(.top, 60)
+                        .transition(.move(edge: .leading))
                     Spacer()
                 }
-                .transition(.move(edge: .leading))
-                .zIndex(2)
             }
         }
     }
