@@ -83,6 +83,23 @@ struct ContentView: View {
                                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                             }
 
+                            // Local News Section
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Local News")
+                                    .font(.headline)
+                                    .padding(.horizontal)
+
+                                let newsToShow = !homeViewModel.carouselArticles.isEmpty ? homeViewModel.getCarouselItems().prefix(3) : fallbackArticles.prefix(3)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 12) {
+                                        ForEach(Array(newsToShow.enumerated()), id: \ .element.id) { (index, article) in
+                                            LocalNewsCard(article: article)
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                }
+                            }
+
                             // New Events Section
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("New Events")
@@ -368,6 +385,56 @@ func eventCircleColor(for event: Event) -> Color {
         return .blue
     } else {
         return .gray
+    }
+}
+
+struct LocalNewsCard: View {
+    let article: ArticleItem
+    @State private var showDetail = false
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                if article.image.hasPrefix("http") {
+                    AsyncImage(url: URL(string: article.image)) { phase in
+                        switch phase {
+                        case .empty:
+                            Circle().fill(Color.gray.opacity(0.2))
+                        case .success(let image):
+                            image.resizable().scaledToFill()
+                        case .failure:
+                            Circle().fill(Color.gray.opacity(0.2))
+                        @unknown default:
+                            Circle().fill(Color.gray.opacity(0.2))
+                        }
+                    }
+                    .frame(width: 56, height: 56)
+                    .clipShape(Circle())
+                } else {
+                    Image(article.image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 56, height: 56)
+                        .clipShape(Circle())
+                }
+            }
+            Text(article.title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity)
+        }
+        .padding(.vertical, 18)
+        .padding(.horizontal, 8)
+        .frame(width: 140, height: 140)
+        .background(Color(.systemBackground))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+        .onTapGesture { showDetail = true }
+        .sheet(isPresented: $showDetail) {
+            ArticleDetailView(article: article)
+        }
     }
 }
 
