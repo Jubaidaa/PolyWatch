@@ -83,23 +83,7 @@ struct ContentView: View {
                                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
                             }
 
-                            // New Events Section
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text("New Events")
-                                    .font(.headline)
-                                    .padding(.horizontal)
-
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 12) {
-                                        ForEach(sampleEvents) { event in
-                                            ActivityCard(event: event)
-                                        }
-                                    }
-                                    .padding(.horizontal)
-                                }
-                            }
-
-                            // Quick Actions
+                            // Local News Quick Action
                             HStack(spacing: 20) {
                                 NavigationLink(destination: UpcomingView(onLogoTap: {
                                     withAnimation {
@@ -113,11 +97,15 @@ struct ContentView: View {
                                     )
                                 }
 
-                                NavigationLink(destination: EventsView(isModal: false)) {
+                                Button(action: {
+                                    withAnimation {
+                                        rootMenuState.showingLocalNews = true
+                                    }
+                                }) {
                                     QuickActionButton(
-                                        title: "Events",
-                                        icon: "calendar.badge.clock",
-                                        color: Color(red: 0.8, green: 0.3, blue: 0.3)
+                                        title: "Local News",
+                                        icon: "newspaper.fill",
+                                        color: Color(red: 0.2, green: 0.5, blue: 0.8)
                                     )
                                 }
                             }
