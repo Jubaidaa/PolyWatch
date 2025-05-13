@@ -6,6 +6,8 @@ class BreakingNewsViewModel: ObservableObject {
     @Published var currentArticles: [RSSItem] = []
     @Published var isLoading = false
     @Published var error: Error?
+    
+    private let newsState = NewsState.shared
 
     // Breaking news feeds
     let breakingNewsFeeds = [
@@ -57,6 +59,8 @@ class BreakingNewsViewModel: ObservableObject {
         }
         withAnimation(.easeInOut(duration: 0.5)) {
             currentArticles = nextArticles
+            // Update shared state with all breaking news articles
+            newsState.updateBreakingNews(articlesBySource.values.flatMap { $0 })
         }
     }
 

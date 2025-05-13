@@ -9,6 +9,7 @@ class HomeViewModel: ObservableObject {
     
     private let rssService = RSSService()
     private let bbcWorldNewsFeed = "https://feeds.bbci.co.uk/news/world/rss.xml"
+    private let newsState = NewsState.shared
     
     init() {
         // Initialize with empty data
@@ -48,10 +49,28 @@ class HomeViewModel: ObservableObject {
     
     // Convert RSSItems to ArticleItems for the carousel
     func getCarouselItems() -> [ArticleItem] {
+        // Combine breaking news and local news articles
+        let allArticles = newsState.getArticlesWithImages()
+        
+        // If we have breaking news articles, use those first
+        if !allArticles.isEmpty {
+            return allArticles.prefix(5).map { item in
+                ArticleItem(
+                    title: item.title,
+                    image: item.imageUrl?.absoluteString ?? "",
+                    date: formatDate(item.pubDate),
+                    source: item.source,
+                    description: item.description,
+                    link: item.link
+                )
+            }
+        }
+        
+        // Fallback to carousel articles if no breaking news
         return carouselArticles.map { item in
             ArticleItem(
                 title: item.title,
-                image: item.imageUrl?.absoluteString ?? "", // No fallback image, we only show articles with images
+                image: item.imageUrl?.absoluteString ?? "",
                 date: formatDate(item.pubDate),
                 source: item.source,
                 description: item.description,
