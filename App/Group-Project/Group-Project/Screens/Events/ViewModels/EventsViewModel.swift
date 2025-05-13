@@ -10,6 +10,7 @@ class EventsViewModel: ObservableObject {
     @Published var hasMorePages = true
     
     private let eventAPI = EventAPI()
+    private let stateManager = StateManager()
     
     // Helper function to check if an event is within the last 2 weeks
     private func isEventRecent(_ event: Event) -> Bool {
@@ -40,6 +41,12 @@ class EventsViewModel: ObservableObject {
         event.date > Date()
     }
     
+    // Helper function to check if an event matches the selected state
+    private func matchesSelectedState(_ event: Event) -> Bool {
+        guard let selectedState = stateManager.selectedState else { return true }
+        return event.state == selectedState
+    }
+    
     func loadEvents(refresh: Bool = false) async {
         if refresh {
             currentPage = 1
@@ -56,28 +63,22 @@ class EventsViewModel: ObservableObject {
             let newEvents = try await eventAPI.fetchEvents(page: currentPage)
             print("Fetched \(newEvents.count) events from API")
             
-            // Log all events and their dates
-            print("\nAll events from API:")
-            for event in newEvents {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateStyle = .full
-                dateFormatter.timeStyle = .short
-                print("Event: \(event.title)")
-                print("Date: \(dateFormatter.string(from: event.date))")
-                print("Is Today: \(Calendar.current.isDateInToday(event.date))")
-                print("Is This Week: \(isEventThisWeek(event))")
-                print("Is Upcoming: \(isEventUpcoming(event))")
-                print("---")
-            }
-            
-            // Filter events based on date only
+            // Filter events based on date and state
             let filteredEvents = newEvents.filter { event in
                 // Only keep events that are happening now or in the future
                 let isFutureEvent = event.date > Date()
                 if !isFutureEvent {
                     print("Event filtered out - in the past: \(event.title)")
+                    return false
                 }
-                return isFutureEvent
+                
+                // Filter by state if one is selected
+                if !matchesSelectedState(event) {
+                    print("Event filtered out - state mismatch: \(event.title)")
+                    return false
+                }
+                
+                return true
             }
             
             print("\nTotal valid events after filtering: \(filteredEvents.count)")
@@ -85,12 +86,6 @@ class EventsViewModel: ObservableObject {
             let sortedEvents = filteredEvents.sorted { $0.date < $1.date } // Sort chronologically
             events.append(contentsOf: sortedEvents)
             print("\nTotal events after appending: \(events.count)")
-            
-            // Log final events and their categories
-            print("\nFinal events in each category:")
-            print("Today: \(events.filter { isEventToday($0) }.count)")
-            print("This Week: \(events.filter { isEventThisWeek($0) }.count)")
-            print("Upcoming: \(events.filter { isEventUpcoming($0) }.count)")
             
             currentPage += 1
             hasMorePages = filteredEvents.count >= 50 // crude check, Mobilize API doesn't provide pagination info

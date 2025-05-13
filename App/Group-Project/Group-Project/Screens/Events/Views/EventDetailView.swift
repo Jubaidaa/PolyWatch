@@ -1,33 +1,46 @@
+// EventDetailView.swift
+// Displays detailed information about a single Event
+
 import SwiftUI
 import SafariServices
 
 struct EventDetailView: View {
     let event: Event
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var menuState: MenuState
     @State private var showingRegistration = false
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                // Event Image
-                if let imageURL = event.imageURL {
-                    AsyncImage(url: URL(string: imageURL)) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.2))
+                // Image
+                if let imageURL = event.imageURL,
+                   let url = URL(string: imageURL) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        case .failure:
+                            Image(systemName: "photo")
+                                .font(.largeTitle)
+                                .foregroundColor(.secondary)
+                        @unknown default:
+                            EmptyView()
+                        }
                     }
                     .frame(height: 240)
                     .clipped()
                 }
-                
+
                 VStack(alignment: .leading, spacing: 20) {
-                    // Title and Status
+                    // Title & Status
                     VStack(alignment: .leading, spacing: 8) {
                         if event.status != .upcoming {
-                            Text(event.status.rawValue.replacingOccurrences(of: "_", with: " ").capitalized)
+                            Text(event.status.rawValue.capitalized)
                                 .font(.caption)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
@@ -35,48 +48,41 @@ struct EventDetailView: View {
                                 .foregroundColor(statusColor)
                                 .clipShape(Capsule())
                         }
-                        
                         Text(event.title)
                             .font(.title)
-                            .fontWeight(.bold)
+                            .bold()
                     }
-                    
-                    // Date and Time
+
+                    // Date & Time
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Date and Time")
+                        Text("Date & Time")
                             .font(.headline)
-                        
                         HStack {
                             Image(systemName: "calendar")
-                                .foregroundColor(.gray)
                             Text(event.formattedDate)
                                 .foregroundColor(.gray)
                         }
-                        
                         if let endDate = event.endDate {
-                            Text("to")
-                                .foregroundColor(.gray)
                             HStack {
+                                Text("to")
                                 Image(systemName: "calendar")
-                                    .foregroundColor(.gray)
                                 Text(formatDate(endDate))
-                                    .foregroundColor(.gray)
                             }
+                            .foregroundColor(.gray)
                         }
                     }
-                    
+
                     // Location
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Location")
                             .font(.headline)
                         HStack {
                             Image(systemName: "mappin.circle.fill")
-                                .foregroundColor(.gray)
                             Text(event.location)
-                                .foregroundColor(.gray)
                         }
+                        .foregroundColor(.gray)
                     }
-                    
+
                     // Price
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Price")
@@ -84,13 +90,13 @@ struct EventDetailView: View {
                         if event.isFree {
                             Text("Free")
                                 .foregroundColor(.green)
-                                .font(.body.bold())
+                                .bold()
                         } else if let price = event.price {
                             Text(price.formatted)
-                                .font(.body.bold())
+                                .bold()
                         }
                     }
-                    
+
                     // Description
                     VStack(alignment: .leading, spacing: 4) {
                         Text("About this event")
@@ -98,7 +104,7 @@ struct EventDetailView: View {
                         Text(event.description)
                             .foregroundColor(.gray)
                     }
-                    
+
                     // Organizer
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Organizer")
@@ -106,12 +112,11 @@ struct EventDetailView: View {
                         Text(event.organizer)
                             .foregroundColor(.gray)
                     }
-                    
+
                     // Tags
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Tags")
                             .font(.headline)
-                        
                         FlowLayout(spacing: 8) {
                             ForEach(event.tags, id: \.self) { tag in
                                 Text(tag)
@@ -123,14 +128,14 @@ struct EventDetailView: View {
                             }
                         }
                     }
-                    
+
                     // Eventbrite Attribution
                     HStack {
                         Spacer()
                         Text("Powered by")
                             .font(.caption)
                             .foregroundColor(.gray)
-                        Image("eventbrite-logo") // You'll need to add this image to your assets
+                        Image("eventbrite-logo")
                             .resizable()
                             .scaledToFit()
                             .frame(height: 20)
@@ -143,55 +148,63 @@ struct EventDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if event.registrationRequired {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Home") {
+                    dismiss()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation {
+                            menuState.closeAllOverlays()
+                        }
+                    }
+                }
+            }
+            
+            if event.registrationRequired {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Register") {
                         showingRegistration = true
                     }
-                    .fontWeight(.semibold)
+                    .bold()
                 }
             }
         }
         .sheet(isPresented: $showingRegistration) {
-            if let url = event.registrationURL, let registrationURL = URL(string: url) {
-                SafariView(url: registrationURL)
+            if let urlString = event.registrationURL,
+               let url = URL(string: urlString) {
+                SafariView(url: url)
             }
         }
     }
-    
+
     private var statusColor: Color {
         switch event.status {
-        case .almostFull:
-            return .orange
-        case .soldOut:
-            return .red
-        case .cancelled:
-            return .gray
-        case .upcoming:
-            return .blue
+        case .almostFull: return .orange
+        case .soldOut:     return .red
+        case .cancelled:   return .gray
+        case .upcoming:    return .blue
         }
     }
-    
+
     private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+        let fmt = DateFormatter()
+        fmt.dateStyle = .medium
+        fmt.timeStyle = .short
+        return fmt.string(from: date)
     }
 }
 
-// Helper view for tag layout
+// Helper for tag wrapping
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8
-    
+
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
-        
         var height: CGFloat = 0
         var currentRow: CGFloat = 0
         var currentX: CGFloat = 0
         var maxWidth: CGFloat = 0
-        
+
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+
         for size in sizes {
             if currentX + size.width > (proposal.width ?? .infinity) {
                 height += currentRow + spacing
@@ -204,17 +217,16 @@ struct FlowLayout: Layout {
             maxWidth = max(maxWidth, currentX)
         }
         height += currentRow
-        
         return CGSize(width: maxWidth, height: height)
     }
-    
+
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
-        
         var currentRow: CGFloat = 0
         var currentX = bounds.minX
         var currentY = bounds.minY
-        
+
+        let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
+
         for (index, size) in sizes.enumerated() {
             if currentX + size.width > bounds.maxX {
                 currentY += currentRow + spacing
@@ -223,7 +235,6 @@ struct FlowLayout: Layout {
             } else {
                 currentRow = max(currentRow, size.height)
             }
-            
             subviews[index].place(
                 at: CGPoint(x: currentX, y: currentY),
                 proposal: ProposedViewSize(size)
@@ -233,32 +244,34 @@ struct FlowLayout: Layout {
     }
 }
 
-// Safari View for registration
+// Safari integration
 struct SafariView: UIViewControllerRepresentable {
     let url: URL
-    
     func makeUIViewController(context: Context) -> SFSafariViewController {
-        return SFSafariViewController(url: url)
+        SFSafariViewController(url: url)
     }
-    
     func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
-#Preview {
-    NavigationView {
-        EventDetailView(event: Event(
-            title: "Sample Event",
-            date: Date(),
-            endDate: Date().addingTimeInterval(3600 * 2),
-            location: "Sample Location",
-            description: "This is a sample event description that shows how the detail view looks.",
-            imageURL: nil,
-            price: Event.Price(amount: 25.0, currency: "USD"),
-            registrationRequired: true,
-            registrationURL: "https://example.com",
-            organizer: "Sample Organizer",
-            tags: ["Sample", "Preview", "Test"],
-            status: .upcoming
-        ))
+struct EventDetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            EventDetailView(event: Event(
+                title: "Sample Event",
+                date: Date(),
+                endDate: nil,
+                location: "123 Main St",
+                description: "A sample event description",
+                imageURL: nil,
+                price: Event.Price.free,
+                registrationRequired: true,
+                registrationURL: nil,
+                organizer: "Sample Organizer",
+                tags: ["Sample", "Event"],
+                status: .upcoming,
+                state: nil
+            ))
+        }
     }
-} 
+}
+

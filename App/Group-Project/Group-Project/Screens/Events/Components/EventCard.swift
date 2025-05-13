@@ -38,49 +38,28 @@ struct EventCard: View {
                 }
                 
                 // Date and Location
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Image(systemName: "calendar")
-                            .foregroundColor(.gray)
-                        Text(event.shortFormattedDate)
-                            .foregroundColor(.gray)
-                    }
-                    
-                    HStack {
-                        Image(systemName: "mappin.circle.fill")
-                            .foregroundColor(.gray)
-                        Text(event.location)
-                            .foregroundColor(.gray)
-                            .lineLimit(1)
-                    }
-                }
-                .font(.subheadline)
-                
-                // Price and Registration
                 HStack {
-                    if event.isFree {
-                        Text("Free")
-                            .foregroundColor(.green)
-                            .font(.subheadline.bold())
-                    } else if let price = event.price {
-                        Text(price.formatted)
-                            .font(.subheadline.bold())
-                    }
-                    
-                    Spacer()
-                    
-                    if event.registrationRequired {
-                        Text("Registration required")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                    }
+                    Image(systemName: "calendar")
+                        .foregroundColor(.gray)
+                    Text(event.shortFormattedDate)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+                
+                HStack {
+                    Image(systemName: "location")
+                        .foregroundColor(.gray)
+                    Text(event.location)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .lineLimit(1)
                 }
             }
             .padding()
         }
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(radius: 2)
     }
     
     private var statusColor: Color {
@@ -98,18 +77,22 @@ struct EventCard: View {
 }
 
 #Preview {
-    EventCard(event: Event(
+    // Create a sample event using the proper initializer
+    let sampleEvent = Event(
         title: "Sample Event",
         date: Date(),
         endDate: nil,
         location: "123 Main St",
         description: "A sample event description",
-        imageURL: nil,
+        imageURL: nil, 
         price: nil,
         registrationRequired: true,
         registrationURL: nil,
         organizer: "Sample Organizer",
         tags: ["Sample", "Event"],
-        status: .upcoming
-    ))
+        status: Event.Status.upcoming,
+        state: "CA"
+    )
+    
+    EventCard(event: sampleEvent)
 } 

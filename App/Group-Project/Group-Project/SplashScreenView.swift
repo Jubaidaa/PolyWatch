@@ -2,10 +2,11 @@ import SwiftUI
 
 struct SplashScreenView: View {
     @State private var isActive = false
-
+    @ObservedObject var rootMenuState: MenuState
+    
     var body: some View {
         if isActive {
-            ContentView()
+            ContentView(rootMenuState: rootMenuState)
         } else {
             VStack {
                 Image("AppLogo") // Replace with your actual logo asset name

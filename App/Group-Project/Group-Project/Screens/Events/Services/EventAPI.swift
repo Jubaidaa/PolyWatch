@@ -174,7 +174,7 @@ struct MobilizeEvent: Codable {
         let endDate = firstTimeslot != nil ? Date(timeIntervalSince1970: TimeInterval(firstTimeslot!.end_date)) : nil
         
         // Extract state from location if available
-        var stateTag = ""
+        var stateTag: String? = nil
         if let venue = location?.venue {
             // Try to find a state abbreviation in the venue
             for state in ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
@@ -183,7 +183,7 @@ struct MobilizeEvent: Codable {
                          "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
                          "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"] {
                 if venue.uppercased().contains(state) {
-                    stateTag = state.lowercased()
+                    stateTag = state
                     break
                 }
             }
@@ -191,8 +191,8 @@ struct MobilizeEvent: Codable {
         
         // Combine existing tags with state tag and add political tags if relevant
         var allTags = tags?.map { $0.name } ?? []
-        if !stateTag.isEmpty {
-            allTags.append(stateTag)
+        if let state = stateTag {
+            allTags.append(state.lowercased())
         }
         
         // Add political tag if the event seems political
@@ -207,6 +207,9 @@ struct MobilizeEvent: Codable {
             }
         }
         
+        // Create a nil Price value of the correct type
+        let priceValue: Event.Price? = nil
+        
         return Event(
             title: title,
             date: startDate,
@@ -214,12 +217,13 @@ struct MobilizeEvent: Codable {
             location: location?.venue ?? "Online/Location TBA",
             description: (description ?? "") + "\n\nSource: MobilizeAmerica",
             imageURL: featured_image_url,
-            price: nil,
+            price: priceValue,
             registrationRequired: true,
             registrationURL: browser_url,
             organizer: sponsor?.name ?? "",
             tags: allTags,
-            status: .upcoming
+            status: Event.Status.upcoming,
+            state: stateTag
         )
     }
 }
