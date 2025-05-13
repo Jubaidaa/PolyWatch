@@ -13,6 +13,8 @@ struct ContentView: View {
 
     // Add HomeViewModel to fetch RSS feed data
     @StateObject private var homeViewModel = HomeViewModel()
+    // Add BreakingNewsPreviewViewModel for Breaking News section
+    @StateObject private var breakingNewsPreviewVM = BreakingNewsPreviewViewModel()
     
     // Fallback articles in case RSS feed fails
     let fallbackArticles = [
@@ -89,7 +91,8 @@ struct ContentView: View {
                                     .font(.headline)
                                     .padding(.horizontal)
 
-                                let newsToShow = !homeViewModel.carouselArticles.isEmpty ? homeViewModel.getCarouselItems().prefix(3) : fallbackArticles.prefix(3)
+                                // Use breakingNewsPreviewVM instead of homeViewModel
+                                let newsToShow = breakingNewsPreviewVM.getBreakingNewsItems().prefix(3)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 12) {
                                         ForEach(Array(newsToShow.enumerated()), id: \ .element.id) { (index, article) in
@@ -191,6 +194,7 @@ struct ContentView: View {
             .task {
                 // Fetch RSS feed data when the view appears
                 await homeViewModel.fetchCarouselNews()
+                await breakingNewsPreviewVM.fetchBreakingNews()
             }
         }
     }
