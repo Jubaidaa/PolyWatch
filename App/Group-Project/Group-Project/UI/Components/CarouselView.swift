@@ -8,90 +8,56 @@ struct CarouselItem: Identifiable {
 
 struct CarouselView: View {
     let items: [CarouselItem]
-    @Binding var currentIndex: Int
-
-    private let timer = Timer.publish(every: 4.5, on: .main, in: .common).autoconnect()
+    @Binding var currentIndex: Int // Not used in this version, but kept for compatibility
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.systemGray5))
-
-            if !items.isEmpty {
-                TabView(selection: $currentIndex) {
-                    ForEach(items.indices, id: \ .self) { index in
-                        ZStack(alignment: .bottom) {
-                            // Image
-                            if let urlString = items[index].imageUrl, let url = URL(string: urlString) {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 16) {
+                ForEach(items) { item in
+                    VStack(spacing: 12) {
+                        ZStack {
+                            if let urlString = item.imageUrl, let url = URL(string: urlString) {
                                 AsyncImage(url: url) { phase in
                                     switch phase {
                                     case .empty:
-                                        Color.gray.opacity(0.2)
+                                        Rectangle().fill(Color.gray.opacity(0.2))
                                     case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
+                                        image.resizable().scaledToFill()
                                     case .failure:
-                                        Image(systemName: "newspaper")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(.white)
+                                        Rectangle().fill(Color.gray.opacity(0.2))
                                     @unknown default:
-                                        Image(systemName: "newspaper")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(.white)
+                                        Rectangle().fill(Color.gray.opacity(0.2))
                                     }
                                 }
+                                .frame(width: 140, height: 90)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
                             } else {
                                 Image(systemName: "newspaper")
                                     .resizable()
                                     .scaledToFit()
-                                    .foregroundColor(.white)
+                                    .frame(width: 140, height: 90)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .foregroundColor(.gray)
                             }
-                            // Overlay
-                            LinearGradient(
-                                gradient: Gradient(colors: [.clear, .black.opacity(0.7)]),
-                                startPoint: .center,
-                                endPoint: .bottom
-                            )
-                            VStack(spacing: 10) {
-                                Spacer()
-                                Text(items[index].title)
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 12)
-                                    .shadow(radius: 8)
-                                HStack(spacing: 8) {
-                                    ForEach(items.indices, id: \ .self) { dotIndex in
-                                        Circle()
-                                            .fill(dotIndex == currentIndex ? Color.white : Color.white.opacity(0.4))
-                                            .frame(width: 8, height: 8)
-                                    }
-                                }
-                                .padding(.bottom, 10)
-                            }
-                            .frame(maxWidth: .infinity)
                         }
-                        .frame(width: 300, height: 180)
-                        .clipped()
-                        .cornerRadius(20)
-                        .tag(index)
+                        Text(item.title)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .frame(maxWidth: .infinity)
                     }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 8)
+                    .frame(width: 140)
+                    .background(Color(.systemBackground))
+                    .cornerRadius(16)
+                    .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                .onReceive(timer) { _ in
-                    withAnimation(.easeInOut) {
-                        currentIndex = (currentIndex + 1) % items.count
-                    }
-                }
-            } else {
-                Text("No items available")
-                    .foregroundColor(.gray)
             }
+            .padding(.horizontal)
         }
-        .frame(width: 300, height: 180)
+        .frame(height: 140)
     }
 }
 
