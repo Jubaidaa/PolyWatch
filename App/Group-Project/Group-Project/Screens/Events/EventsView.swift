@@ -64,33 +64,27 @@ struct EventsView: View {
                 }) {
                     VStack(alignment: .leading, spacing: 12) {
                         if let imageURL = event.imageURL, let url = URL(string: imageURL) {
-                            ZStack {
-                                Circle()
-                                    .fill(eventCircleColor(for: event))
-                                    .frame(width: 56, height: 56)
-                                AsyncImage(url: url) { image in
-                                    image.resizable().scaledToFill()
-                                } placeholder: {
-                                    Color.clear
-                                }
-                                .frame(width: 48, height: 48)
-                                .clipShape(Circle())
+                            AsyncImage(url: url) { image in
+                                image.resizable().aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Rectangle().fill(Color.gray.opacity(0.2))
                             }
-                            .padding(.top, 12)
+                            .frame(height: 220)
+                            .frame(maxWidth: .infinity)
+                            .clipped()
+                            .cornerRadius(16)
                         }
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(event.title)
-                                .font(.title3)
-                                .fontWeight(.bold)
-                            Text(event.shortFormattedDate)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            Text(event.location)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding([.horizontal, .bottom])
+                        Text(event.title)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                        Text(event.shortFormattedDate)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        Text(event.location)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
+                    .padding()
                     .background(Color(.systemBackground))
                     .cornerRadius(18)
                     .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
