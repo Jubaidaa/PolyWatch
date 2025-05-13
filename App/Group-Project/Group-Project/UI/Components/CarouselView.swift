@@ -99,8 +99,8 @@ struct CarouselView_Previews: PreviewProvider {
     static var previews: some View {
         CarouselView(
             items: [
-                CarouselItem(title: "Test 1", imageName: "newspaper", articleImage: nil),
-                CarouselItem(title: "Test 2", imageName: "newspaper", articleImage: nil)
+                CarouselItem(title: "Test 1", imageUrl: nil),
+                CarouselItem(title: "Test 2", imageUrl: nil)
             ],
             currentIndex: .constant(0)
         )
