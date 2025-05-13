@@ -529,9 +529,29 @@ struct ElectionCalendarView: View {
                     
                     // Calendar header
                     VStack(spacing: 8) {
-                        Text("Election Calendar")
-                            .font(.system(size: 28, weight: .bold))
-                            .padding(.top, 8)
+                        HStack {
+                            Button(action: {
+                                withAnimation {
+                                    menuState.returnToMainView()
+                                }
+                            }) {
+                                HStack {
+                                    Image(systemName: "arrow.left")
+                                        .foregroundColor(AppColors.red)
+                                    Text("Back")
+                                        .foregroundColor(AppColors.red)
+                                }
+                                .padding(.leading)
+                            }
+                            
+                            Spacer()
+                            
+                            Text("Election Calendar")
+                                .font(.system(size: 28, weight: .bold))
+                                .padding(.top, 8)
+                            
+                            Spacer()
+                        }
                         
                         HStack {
                             Button(action: { viewModel.moveMonth(by: -1) }) {
