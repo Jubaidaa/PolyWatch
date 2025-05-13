@@ -87,7 +87,7 @@ struct StatePickerView: View {
     
     var body: some View {
         NavigationView {
-            List(states, id: \.self) { state in
+            List(states, id: \.self) { state in
                 HStack {
                     Text(state)
                     Spacer()
@@ -109,5 +109,4 @@ struct StatePickerView: View {
 
 #Preview {
     UserProfileView()
-} 
 } 
