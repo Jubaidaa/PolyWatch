@@ -38,8 +38,21 @@ struct HomeView: View {
                             articleImage: article.image
                         )
                     }
-                    CarouselView(items: carouselItems, currentIndex: $currentIndex)
-                        .padding(.horizontal, Constants.Padding.standard)
+                    
+                    if carouselItems.isEmpty {
+                        VStack(spacing: Constants.Padding.standard) {
+                            Image(systemName: "newspaper")
+                                .font(.system(size: 48))
+                                .foregroundColor(AppColors.blue)
+                            Text("No articles available")
+                                .font(.headline)
+                                .foregroundColor(AppColors.blue)
+                        }
+                        .frame(height: 400)
+                    } else {
+                        CarouselView(items: carouselItems, currentIndex: $currentIndex)
+                            .padding(.horizontal, Constants.Padding.standard)
+                    }
                 }
                 
                 Spacer()

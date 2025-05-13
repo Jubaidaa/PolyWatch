@@ -72,7 +72,14 @@ class BreakingNewsViewModel: ObservableObject {
                     let service = RSSService()
                     do {
                         try await service.fetchRSS(from: feed)
-                        return (source, service.items)
+                        // Filter articles to only include those with valid images
+                        let articlesWithImages = service.items.filter { item in
+                            if let imageUrl = item.imageUrl?.absoluteString {
+                                return !imageUrl.isEmpty && URL(string: imageUrl) != nil
+                            }
+                            return false
+                        }
+                        return (source, articlesWithImages)
                     } catch {
                         print("Error fetching \(source) feed: \(error)")
                         return nil

@@ -21,15 +21,24 @@ class HomeViewModel: ObservableObject {
         do {
             try await rssService.fetchRSS(from: bbcWorldNewsFeed)
             
-            // Get up to 5 articles for the carousel
-            let articles = rssService.items.prefix(5).map { $0 }
+            // Filter articles to only include those with valid images
+            let articlesWithImages = rssService.items.filter { item in
+                if let imageUrl = item.imageUrl?.absoluteString {
+                    // Check if the URL is valid and not empty
+                    return !imageUrl.isEmpty && URL(string: imageUrl) != nil
+                }
+                return false
+            }
+            
+            // Get up to 5 articles with images for the carousel
+            let articles = articlesWithImages.prefix(5).map { $0 }
             
             withAnimation {
                 self.carouselArticles = articles
                 self.isLoading = false
             }
             
-            print("Fetched \(articles.count) BBC news articles for carousel")
+            print("Fetched \(articles.count) BBC news articles with images for carousel")
         } catch {
             self.error = error
             self.isLoading = false
@@ -42,7 +51,7 @@ class HomeViewModel: ObservableObject {
         return carouselArticles.map { item in
             ArticleItem(
                 title: item.title,
-                image: item.imageUrl?.absoluteString ?? "news1", // Fallback to default image
+                image: item.imageUrl?.absoluteString ?? "", // No fallback image, we only show articles with images
                 date: formatDate(item.pubDate),
                 source: item.source,
                 description: item.description,
