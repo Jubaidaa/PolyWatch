@@ -159,6 +159,9 @@ struct SidebarMenuContent: View {
                 ) {
                     withAnimation {
                         menuState.showingHelp = true
+                        // Hard-code to present HelpSidebarView
+                        let helpSidebarView = HelpSidebarView()
+                        UIApplication.shared.windows.first?.rootViewController?.present(UIHostingController(rootView: helpSidebarView), animated: true)
                     }
                 }
             }
