@@ -152,15 +152,6 @@ struct SidebarMenuContent: View {
                         #endif
                     }
                 }
-
-                MenuButton(
-                    title: "Get Help",
-                    icon: "questionmark.circle"
-                ) {
-                    withAnimation {
-                        menuState.showingHelp = true
-                    }
-                }
             }
             .padding(.horizontal, Constants.Padding.standard)
             .padding(.bottom, Constants.Padding.standard)
