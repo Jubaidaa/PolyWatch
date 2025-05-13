@@ -346,6 +346,12 @@ struct ActivityCard: View {
                     .lineLimit(3)
                     .fixedSize(horizontal: false, vertical: true)
             }
+
+            if !event.description.isEmpty {
+                Text(event.description)
+                    .font(.body)
+                    .padding(.top, 8)
+            }
         }
         .padding()
         .frame(width: 140)
