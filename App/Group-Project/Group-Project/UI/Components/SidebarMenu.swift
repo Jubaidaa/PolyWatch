@@ -38,7 +38,7 @@ struct SidebarMenuContent: View {
             .padding(.vertical, Constants.Padding.vertical)
 
             // Menu Items
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 MenuButton(
                     title: "Breaking News",
                     icon: "bolt"
@@ -90,7 +90,7 @@ struct SidebarMenuContent: View {
                 }
             }
             .padding(.horizontal, Constants.Padding.standard)
-            .padding(.bottom, Constants.Padding.standard)
+            .padding(.bottom, Constants.Padding.small)
 
             Spacer()
 
@@ -101,7 +101,7 @@ struct SidebarMenuContent: View {
                 .padding(.bottom, Constants.Padding.standard)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 320)
+        .frame(height: 280)
         .background(AppColors.red)
         .cornerRadius(Constants.Dimensions.cornerRadius)
     }
