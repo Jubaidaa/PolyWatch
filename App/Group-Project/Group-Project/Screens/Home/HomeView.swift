@@ -49,6 +49,7 @@ struct HomeView: View {
                             .frame(height: 220)
                         } else {
                             CarouselView(items: carouselItems, currentIndex: $currentIndex)
+                                .frame(height: 180)
                                 .padding(.horizontal, Constants.Padding.standard)
                         }
                     }
