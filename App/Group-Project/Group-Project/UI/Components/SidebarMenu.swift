@@ -124,21 +124,6 @@ struct SidebarMenuContent: View {
                 }
 
                 MenuButton(
-                    title: "Register to Vote",
-                    icon: "checkmark.circle"
-                ) {
-                    withAnimation {
-                        menuState.isShowing = false
-                        menuState.showingVoterRegistration = true
-                        #if DEBUG
-                        print("🔍 Register to Vote button tapped")
-                        print("   menuState ID: \(menuState.id)")
-                        print("   showingVoterRegistration: \(menuState.showingVoterRegistration)")
-                        #endif
-                    }
-                }
-
-                MenuButton(
                     title: "Upcoming Events",
                     icon: "calendar"
                 ) {
@@ -149,6 +134,21 @@ struct SidebarMenuContent: View {
                         print("🔍 Upcoming Events button tapped")
                         print("   menuState ID: \(menuState.id)")
                         print("   showingCalendar: \(menuState.showingCalendar)")
+                        #endif
+                    }
+                }
+
+                MenuButton(
+                    title: "Register to Vote",
+                    icon: "checkmark.circle"
+                ) {
+                    withAnimation {
+                        menuState.isShowing = false
+                        menuState.showingVoterRegistration = true
+                        #if DEBUG
+                        print("🔍 Register to Vote button tapped")
+                        print("   menuState ID: \(menuState.id)")
+                        print("   showingVoterRegistration: \(menuState.showingVoterRegistration)")
                         #endif
                     }
                 }
@@ -181,7 +181,7 @@ struct SidebarMenuContent: View {
                 .padding(.bottom, Constants.Padding.standard)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 320)
+        .frame(height: 260)
         .background(AppColors.red)
         .cornerRadius(Constants.Dimensions.cornerRadius)
     }
