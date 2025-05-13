@@ -62,27 +62,28 @@ struct EventsView: View {
                     selectedEvent = event
                     showDetail = true
                 }) {
-                    HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 8) {
                         if let imageURL = event.imageURL, let url = URL(string: imageURL) {
                             AsyncImage(url: url) { image in
                                 image.resizable().aspectRatio(contentMode: .fill)
                             } placeholder: {
                                 Rectangle().fill(Color.gray.opacity(0.2))
                             }
-                            .frame(width: 60, height: 60)
+                            .frame(height: 220)
+                            .frame(maxWidth: .infinity)
                             .clipped()
-                            .cornerRadius(8)
+                            .cornerRadius(16)
                         }
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(event.title)
-                                .font(.headline)
-                            Text(event.shortFormattedDate)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            Text(event.location)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                        Text(event.title)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .padding(.top, 4)
+                        Text(event.shortFormattedDate)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        Text(event.location)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                     .padding(.vertical, 8)
                 }

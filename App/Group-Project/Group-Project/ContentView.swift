@@ -321,12 +321,13 @@ struct ActivityCard: View {
     let event: Event
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .center, spacing: 12) {
             HStack {
+                Spacer()
                 ZStack {
                     Circle()
                         .fill(Color.blue)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 48, height: 48)
                     if
                         let imageURL = event.imageURL,
                         let url = URL(string: imageURL)
@@ -336,22 +337,18 @@ struct ActivityCard: View {
                         } placeholder: {
                             Color.clear
                         }
-                        .frame(width: 28, height: 28)
+                        .frame(width: 44, height: 44)
                         .clipShape(Circle())
                     }
                 }
-                Text(event.title)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .lineLimit(3)
-                    .fixedSize(horizontal: false, vertical: true)
+                Spacer()
             }
-
-            if !event.description.isEmpty {
-                Text(event.description)
-                    .font(.body)
-                    .padding(.top, 8)
-            }
+            Text(event.title)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .multilineTextAlignment(.center)
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
         .frame(width: 140)
