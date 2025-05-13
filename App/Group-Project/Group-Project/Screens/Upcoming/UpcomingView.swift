@@ -43,6 +43,13 @@ struct UpcomingView: View {
                     }
                 )
                 
+                // Election Calendar Title
+                Text("Election Calendar")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding(.top, 12)
+                    .padding(.bottom, 4)
+                
                 // You could insert a picker here to toggle selectedView between .list and .calendar
                 
                 if viewModel.isLoading {

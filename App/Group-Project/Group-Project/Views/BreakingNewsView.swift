@@ -54,25 +54,12 @@ struct BreakingNewsView: View {
                     Button(action: {
                         withAnimation {
                             menuState.closeAllOverlays()
-                            #if DEBUG
-                            print("🏠 BreakingNewsView: PolyWatch button tapped - returning to home screen")
-                            print("   menuState ID: \(menuState.id)")
-                            #endif
                         }
                     }) {
-                        Text("PolyWatch")
+                        Text("Close")
                             .fontWeight(.bold)
                             .foregroundColor(AppColors.red)
                     }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Close") {
-                        withAnimation {
-                            menuState.showingBreakingNews = false
-                        }
-                    }
-                    .foregroundColor(AppColors.blue)
                 }
             }
             .task {
