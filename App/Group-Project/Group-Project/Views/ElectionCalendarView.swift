@@ -523,7 +523,13 @@ struct ElectionCalendarView: View {
                                     menuState.returnToMainView()
                                 }
                             },
-                            onSearchTap: {}
+                            onSearchTap: {},
+                            showBackButton: true,
+                            onBackTap: {
+                                withAnimation {
+                                    menuState.returnToMainView()
+                                }
+                            }
                         )
                     }
                     
@@ -532,6 +538,7 @@ struct ElectionCalendarView: View {
                         Text("Election Calendar")
                             .font(.system(size: 28, weight: .bold))
                             .padding(.top, 8)
+                            .frame(maxWidth: .infinity, alignment: .center)
                         
                         HStack {
                             Button(action: { viewModel.moveMonth(by: -1) }) {

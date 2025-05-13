@@ -60,14 +60,14 @@ struct SidebarMenuContent: View {
                 }
 
                 MenuButton(
-                    title: "Upcoming Events",
+                    title: "Election Calendar",
                     icon: "calendar"
                 ) {
                     withAnimation {
                         menuState.isShowing = false
                         menuState.showingCalendar = true
                         #if DEBUG
-                        print("🔍 Upcoming Events button tapped")
+                        print("🔍 Election Calendar button tapped")
                         print("   menuState ID: \(menuState.id)")
                         print("   showingCalendar: \(menuState.showingCalendar)")
                         #endif
