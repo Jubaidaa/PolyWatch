@@ -100,22 +100,6 @@ struct ContentView: View {
                                 }
                             }
 
-                            // New Events Section
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text("New Events")
-                                    .font(.headline)
-                                    .padding(.horizontal)
-
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 12) {
-                                        ForEach(sampleEvents) { event in
-                                            ActivityCard(event: event)
-                                        }
-                                    }
-                                    .padding(.horizontal)
-                                }
-                            }
-
                             // Quick Actions
                             HStack(spacing: 20) {
                                 NavigationLink(destination: UpcomingView(onLogoTap: {
