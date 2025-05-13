@@ -156,8 +156,8 @@ struct EventDetailSheet: View {
                 Text(event.location)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                if let desc = event.description {
-                    Text(desc)
+                if !event.description.isEmpty {
+                    Text(event.description)
                         .font(.body)
                         .padding(.top, 8)
                 }
