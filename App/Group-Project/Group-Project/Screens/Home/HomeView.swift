@@ -27,31 +27,32 @@ struct HomeView: View {
                 Spacer()
                 
                 // MARK: - Carousel
-                if homeViewModel.isLoading {
-                    ProgressView("Loading news...")
-                        .frame(height: 400)
-                } else {
-                    let carouselItems = homeViewModel.getCarouselItems().map { article in
-                        CarouselItem(
-                            title: article.title,
-                            imageName: "newspaper",
-                            articleImage: article.image
-                        )
-                    }
-                    
-                    if carouselItems.isEmpty {
-                        VStack(spacing: Constants.Padding.standard) {
-                            Image(systemName: "newspaper")
-                                .font(.system(size: 48))
-                                .foregroundColor(AppColors.blue)
-                            Text("No articles available")
-                                .font(.headline)
-                                .foregroundColor(AppColors.blue)
-                        }
-                        .frame(height: 400)
+                Group {
+                    if homeViewModel.isLoading {
+                        ProgressView("Loading news...")
+                            .frame(height: 220)
                     } else {
-                        CarouselView(items: carouselItems, currentIndex: $currentIndex)
-                            .padding(.horizontal, Constants.Padding.standard)
+                        let carouselItems = homeViewModel.getCarouselItems().map { article in
+                            CarouselItem(
+                                title: article.title,
+                                imageName: "newspaper",
+                                articleImage: article.image
+                            )
+                        }
+                        if carouselItems.isEmpty {
+                            VStack(spacing: Constants.Padding.standard) {
+                                Image(systemName: "newspaper")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(AppColors.blue)
+                                Text("No articles available")
+                                    .font(.headline)
+                                    .foregroundColor(AppColors.blue)
+                            }
+                            .frame(height: 220)
+                        } else {
+                            CarouselView(items: carouselItems, currentIndex: $currentIndex)
+                                .padding(.horizontal, Constants.Padding.standard)
+                        }
                     }
                 }
                 
