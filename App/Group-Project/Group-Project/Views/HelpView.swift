@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct HelpView: View {
+struct MainHelpView: View {
     @EnvironmentObject private var menuState: MenuState
     @State private var selectedSection: InfoSection = .rights
     @State private var selectedDetail: DetailInfo?
@@ -65,13 +65,7 @@ struct HelpView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Close") {
-                        dismiss()
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation {
-                                menuState.showingVoterRegistration = true
-                            }
-                        }
+                        menuState.returnToMainView()
                     }
                     .foregroundColor(AppColors.blue)
                 }
@@ -260,7 +254,7 @@ struct HelpView: View {
 
 struct HelpView_Previews: PreviewProvider {
     static var previews: some View {
-        HelpView()
+        MainHelpView()
             .environmentObject(MenuState())
     }
 } 

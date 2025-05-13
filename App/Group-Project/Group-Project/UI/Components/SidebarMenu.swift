@@ -181,7 +181,7 @@ struct SidebarMenuContent: View {
                 .padding(.bottom, Constants.Padding.standard)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 260)
+        .frame(height: 320)
         .background(AppColors.red)
         .cornerRadius(Constants.Dimensions.cornerRadius)
     }
