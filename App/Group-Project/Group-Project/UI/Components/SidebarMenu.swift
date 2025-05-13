@@ -158,14 +158,7 @@ struct SidebarMenuContent: View {
                     icon: "questionmark.circle"
                 ) {
                     withAnimation {
-                        // First close all overlays
-                        menuState.closeAllOverlays()
-                        // Using asyncAfter to ensure the overlays are closed before showing help
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation {
-                                menuState.showingHelp = true
-                            }
-                        }
+                        menuState.showingHelp = true
                     }
                 }
             }
