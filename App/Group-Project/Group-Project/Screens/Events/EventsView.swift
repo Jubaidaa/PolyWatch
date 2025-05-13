@@ -7,6 +7,8 @@ struct EventsView: View {
     @State private var selectedFilter: FilterType = .all
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var menuState: MenuState
+    @State private var selectedEvent: Event? = nil
+    @State private var showDetail: Bool = false
     
     enum FilterType: String, CaseIterable, Identifiable {
         case all = "All"
@@ -56,21 +58,43 @@ struct EventsView: View {
             
             // Event List
             List(filteredEvents) { event in
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(event.title)
-                        .font(.headline)
-                    Text(event.shortFormattedDate)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    Text(event.location)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                Button(action: {
+                    selectedEvent = event
+                    showDetail = true
+                }) {
+                    HStack(alignment: .top, spacing: 12) {
+                        if let imageURL = event.imageURL, let url = URL(string: imageURL) {
+                            AsyncImage(url: url) { image in
+                                image.resizable().aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Rectangle().fill(Color.gray.opacity(0.2))
+                            }
+                            .frame(width: 60, height: 60)
+                            .clipped()
+                            .cornerRadius(8)
+                        }
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(event.title)
+                                .font(.headline)
+                            Text(event.shortFormattedDate)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            Text(event.location)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 8)
                 }
-                .padding(.vertical, 8)
             }
             .listStyle(PlainListStyle())
             .onAppear {
                 Task { await viewModel.loadEvents() }
+            }
+            .sheet(isPresented: $showDetail) {
+                if let event = selectedEvent {
+                    EventDetailSheet(event: event)
+                }
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -86,13 +110,13 @@ struct EventsView: View {
         let oneWeekAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
         
         let events = viewModel.events.filter { event in
-            searchText.isEmpty || event.title.localizedCaseInsensitiveContains(searchText)
+            (event.imageURL != nil && !(event.imageURL?.isEmpty ?? true)) &&
+            (searchText.isEmpty || event.title.localizedCaseInsensitiveContains(searchText))
         }
         
         switch selectedFilter {
         case .all:
             return events.filter { event in
-                // All = Upcoming + events from the past week
                 (event.date >= now && event.date <= threeMonthsLater) ||
                 (event.date < now && event.date >= oneWeekAgo)
             }.sorted { $0.date < $1.date }
@@ -104,6 +128,47 @@ struct EventsView: View {
             return events.filter { event in
                 event.date >= startOfWeek && event.date <= endOfWeek
             }.sorted { $0.date < $1.date }
+        }
+    }
+}
+
+// Event detail sheet
+struct EventDetailSheet: View {
+    let event: Event
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if let imageURL = event.imageURL, let url = URL(string: imageURL) {
+                    AsyncImage(url: url) { image in
+                        image.resizable().aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        Rectangle().fill(Color.gray.opacity(0.2))
+                    }
+                    .frame(height: 200)
+                    .clipped()
+                }
+                Text(event.title)
+                    .font(.title)
+                    .bold()
+                Text(event.shortFormattedDate)
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                Text(event.location)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                if let desc = event.description {
+                    Text(desc)
+                        .font(.body)
+                        .padding(.top, 8)
+                }
+                if let urlString = event.registrationURL, let url = URL(string: urlString) {
+                    Link("View Event / Register", destination: url)
+                        .font(.headline)
+                        .foregroundColor(.blue)
+                        .padding(.top, 8)
+                }
+            }
+            .padding()
         }
     }
 } 
