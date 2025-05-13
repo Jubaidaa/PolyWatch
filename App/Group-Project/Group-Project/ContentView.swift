@@ -58,7 +58,7 @@ struct ContentView: View {
                                 rootMenuState.returnToMainView()
                             }
                         },
-                        onSearchTap: {}
+                        onSearchTap: { showProfile = true }
                     )
                     .environmentObject(rootMenuState)
 
