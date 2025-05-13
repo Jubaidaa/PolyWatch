@@ -47,10 +47,27 @@ struct HomeView: View {
                             }
                             .frame(height: 220)
                         } else {
-                            FixedCarouselView(items: carouselItems, currentIndex: $currentIndex)
+                            CarouselView(items: carouselItems, currentIndex: $currentIndex)
                                 .frame(width: 300, height: 180)
                                 .padding(.horizontal, Constants.Padding.standard)
                         }
+                    }
+                }
+                
+                // MARK: - Local News Section
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Local News")
+                        .font(.headline)
+                        .padding(.horizontal)
+
+                    let newsToShow = homeViewModel.getBreakingNewsItemsForLocalSection().prefix(3)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(Array(newsToShow.enumerated()), id: \ .element.id) { (index, article) in
+                                LocalNewsCard(article: article)
+                            }
+                        }
+                        .padding(.horizontal)
                     }
                 }
                 
@@ -89,6 +106,7 @@ struct HomeView: View {
         .task {
             // Fetch RSS feed data when the view appears
             await homeViewModel.fetchCarouselNews()
+            await homeViewModel.fetchBreakingNewsForLocalSection()
         }
     }
 }
