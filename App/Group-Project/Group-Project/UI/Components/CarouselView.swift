@@ -100,7 +100,8 @@ struct CarouselView: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: Constants.Dimensions.cornerRadius * 2))
         }
-        .aspectRatio(16/9, contentMode: .fit)
+        .aspectRatio(2.5, contentMode: .fit)
+        .frame(maxHeight: 220)
     }
 }
 
