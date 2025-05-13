@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct MainHelpView: View {
+struct HelpView: View {
     @EnvironmentObject private var menuState: MenuState
     @State private var selectedSection: InfoSection = .rights
     @State private var selectedDetail: DetailInfo?
@@ -254,7 +254,7 @@ struct MainHelpView: View {
 
 struct HelpView_Previews: PreviewProvider {
     static var previews: some View {
-        MainHelpView()
+        HelpView()
             .environmentObject(MenuState())
     }
 } 
