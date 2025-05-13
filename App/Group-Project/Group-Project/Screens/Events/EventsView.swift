@@ -64,15 +64,18 @@ struct EventsView: View {
                 }) {
                     VStack(alignment: .leading, spacing: 12) {
                         if let imageURL = event.imageURL, let url = URL(string: imageURL) {
-                            AsyncImage(url: url) { image in
-                                image.resizable().aspectRatio(contentMode: .fill)
-                            } placeholder: {
-                                Rectangle().fill(Color.gray.opacity(0.2))
+                            HStack {
+                                Spacer()
+                                AsyncImage(url: url) { image in
+                                    image.resizable().aspectRatio(contentMode: .fill)
+                                } placeholder: {
+                                    Rectangle().fill(Color.gray.opacity(0.2))
+                                }
+                                .frame(width: 140, height: 120)
+                                .clipped()
+                                .cornerRadius(16)
+                                Spacer()
                             }
-                            .frame(height: 220)
-                            .frame(maxWidth: .infinity)
-                            .clipped()
-                            .cornerRadius(16)
                         }
                         Text(event.title)
                             .font(.title3)
