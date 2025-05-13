@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct EventsView: View {
+    let isModal: Bool
     @StateObject private var viewModel = EventsViewModel()
     @State private var searchText = ""
     @State private var selectedFilter: FilterType = .all
@@ -10,6 +11,10 @@ struct EventsView: View {
         case upcoming = "Upcoming"
         case thisWeek = "This Week"
         var id: String { rawValue }
+    }
+    
+    init(isModal: Bool = false) {
+        self.isModal = isModal
     }
     
     var body: some View {
