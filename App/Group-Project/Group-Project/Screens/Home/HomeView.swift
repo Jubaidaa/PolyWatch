@@ -47,15 +47,21 @@ struct HomeView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.secondary))
                     
-                    NavigationLink(destination: EventsView(isModal: false)) {
+                    Button {
+                        withAnimation {
+                            menuState.showingLocalNews = true
+                        }
+                    } label: {
                         HStack {
-                            Image(systemName: "star.fill")
+                            Image(systemName: "newspaper.fill")
                                 .font(.title2)
-                            Text("Events")
+                                .symbolEffect(.bounce, options: .repeating)
+                            Text("Local News")
                                 .font(.headline)
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
+                    .accessibilityHint("Opens local news feed")
                 }
                 .padding(.horizontal, Constants.Padding.large)
                 .padding(.bottom, Constants.Padding.bottom)
