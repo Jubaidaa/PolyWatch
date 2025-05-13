@@ -321,40 +321,49 @@ struct ActivityCard: View {
     let event: Event
 
     var body: some View {
-        VStack(alignment: .center, spacing: 12) {
-            HStack {
-                Spacer()
-                ZStack {
-                    Circle()
-                        .fill(Color.blue)
-                        .frame(width: 48, height: 48)
-                    if
-                        let imageURL = event.imageURL,
-                        let url = URL(string: imageURL)
-                    {
-                        AsyncImage(url: url) { image in
-                            image.resizable().scaledToFill()
-                        } placeholder: {
-                            Color.clear
-                        }
-                        .frame(width: 44, height: 44)
-                        .clipShape(Circle())
+        VStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(eventCircleColor(for: event))
+                    .frame(width: 56, height: 56)
+                if
+                    let imageURL = event.imageURL,
+                    let url = URL(string: imageURL)
+                {
+                    AsyncImage(url: url) { image in
+                        image.resizable().scaledToFill()
+                    } placeholder: {
+                        Color.clear
                     }
+                    .frame(width: 48, height: 48)
+                    .clipShape(Circle())
                 }
-                Spacer()
             }
             Text(event.title)
                 .font(.subheadline)
-                .fontWeight(.medium)
+                .fontWeight(.semibold)
                 .multilineTextAlignment(.center)
-                .lineLimit(3)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity)
         }
-        .padding()
-        .frame(width: 140)
+        .padding(.vertical, 18)
+        .padding(.horizontal, 8)
+        .frame(width: 140, height: 140)
         .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(radius: 2)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+    }
+}
+
+// Helper function for circle color
+func eventCircleColor(for event: Event) -> Color {
+    let tags = event.tags.map { $0.lowercased() }
+    if tags.contains(where: { $0.contains("republican") }) {
+        return .red
+    } else if tags.contains(where: { $0.contains("democrat") || $0.contains("democratic") }) {
+        return .blue
+    } else {
+        return .gray
     }
 }
 
