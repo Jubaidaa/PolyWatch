@@ -56,9 +56,9 @@ struct HomeView: View {
                     }
                 }
                 
-                // MARK: - Local News Section
+                // MARK: - Breaking News Section
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Local News")
+                    Text("Breaking News")
                         .font(.headline)
                         .padding(.horizontal)
                     
@@ -87,19 +87,19 @@ struct HomeView: View {
                     
                     Button {
                         withAnimation {
-                            menuState.showingLocalNews = true
+                            menuState.showingBreakingNews = true
                         }
                     } label: {
                         HStack {
                             Image(systemName: "newspaper.fill")
                                 .font(.title2)
                                 .symbolEffect(.bounce, options: .repeating)
-                            Text("Local News")
+                            Text("Breaking News")
                                 .font(.headline)
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
-                    .accessibilityHint("Opens local news feed")
+                    .accessibilityHint("Opens breaking news feed")
                 }
                 .padding(.horizontal, Constants.Padding.large)
                 .padding(.bottom, Constants.Padding.bottom)
