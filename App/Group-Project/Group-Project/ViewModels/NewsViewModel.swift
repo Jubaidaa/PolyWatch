@@ -86,7 +86,14 @@ class NewsViewModel: ObservableObject {
                     let service = RSSService()
                     do {
                         try await service.fetchRSS(from: feed)
-                        return (source, service.items)
+                        // Filter articles to only include those with valid images
+                        let articlesWithImages = service.items.filter { item in
+                            if let imageUrl = item.imageUrl?.absoluteString {
+                                return !imageUrl.isEmpty && URL(string: imageUrl) != nil
+                            }
+                            return false
+                        }
+                        return (source, articlesWithImages)
                     } catch {
                         print("Error fetching \(source) feed: \(error)")
                         return nil
@@ -97,7 +104,7 @@ class NewsViewModel: ObservableObject {
             // Collect results
             for await result in group {
                 if let (source, items) = result {
-                    print("Fetched \(items.count) items from \(source)") // Debug info
+                    print("Fetched \(items.count) items with images from \(source)") // Debug info
                     articlesBySource[source] = items
                     currentIndexBySource[source] = 0
                 }
@@ -110,7 +117,7 @@ class NewsViewModel: ObservableObject {
         
         // Debug info
         let totalArticles = articlesBySource.values.map { $0.count }.reduce(0, +)
-        print("Total articles fetched: \(totalArticles)")
+        print("Total articles with images fetched: \(totalArticles)")
     }
     
     func fetchBreakingNews() async {
