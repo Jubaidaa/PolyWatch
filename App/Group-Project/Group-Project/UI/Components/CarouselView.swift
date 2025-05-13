@@ -6,7 +6,7 @@ struct CarouselItem: Identifiable {
     let imageUrl: String?
 }
 
-struct FixedCarouselView: View {
+struct CarouselView: View {
     let items: [CarouselItem]
     @Binding var currentIndex: Int
 
