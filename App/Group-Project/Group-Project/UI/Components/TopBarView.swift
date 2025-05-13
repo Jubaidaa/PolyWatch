@@ -17,9 +17,9 @@ struct TopBarView: View {
                     Button(action: {
                         onBackTap?()
                     }) {
-                        Image(systemName: "chevron.left")
+                        Image(systemName: "arrow.left")
                             .font(.system(size: Constants.Dimensions.iconSize))
-                            .foregroundColor(AppColors.TopBar.icons)
+                            .foregroundColor(AppColors.white)
                             .accessibilityLabel("Back")
                     }
                 } else {
