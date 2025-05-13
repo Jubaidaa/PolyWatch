@@ -88,10 +88,14 @@ struct EventsView: View {
                     .background(Color(.systemBackground))
                     .cornerRadius(18)
                     .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
+                    .frame(maxWidth: 370)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 8)
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 0)
                 }
                 .buttonStyle(PlainButtonStyle())
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
             }
             .listStyle(PlainListStyle())
             .onAppear {

@@ -1,8 +1,12 @@
 import SwiftUI
 
 struct UserProfileView: View {
-    @StateObject private var stateManager = StateManager()
-    @State private var showingLogoutAlert = false
+    @AppStorage("profileName") private var name: String = "John Doe"
+    @AppStorage("profilePhone") private var phone: String = "+1 555-123-4567"
+    @AppStorage("profileEmail") private var email: String = "johndoe@email.com"
+    @AppStorage("profileState") private var selectedState: String = "California"
+    @Environment(\.presentationMode) private var presentationMode
+    @EnvironmentObject private var menuState: MenuState
     
     let states = [
         "Alabama", "Alaska", "Arizona", "Arkansas", "California",
@@ -17,66 +21,93 @@ struct UserProfileView: View {
         "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
     ]
     
+    @State private var showStatePicker = false
+    
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Profile Information")) {
+                Section(header: Text("Profile Info")) {
                     HStack {
-                        Image(systemName: "person.circle.fill")
+                        Image(systemName: "person.crop.circle.fill")
                             .resizable()
                             .frame(width: 60, height: 60)
-                            .foregroundColor(.gray)
-                        
+                            .foregroundColor(.blue)
                         VStack(alignment: .leading) {
-                            Text("John Doe")
+                            Text(name)
                                 .font(.headline)
-                            Text("john.doe@example.com")
+                            Text(phone)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            Text(email)
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
                     }
-                    .padding(.vertical, 8)
                 }
-                
-                Section(header: Text("Location")) {
-                    Picker("State", selection: $stateManager.selectedState) {
-                        Text("All States").tag(nil as String?)
-                        ForEach(states, id: \.self) { state in
-                            Text(state).tag(state as String?)
+                Section(header: Text("State")) {
+                    Button(action: { showStatePicker = true }) {
+                        HStack {
+                            Text("State:")
+                            Spacer()
+                            Text(selectedState)
+                                .foregroundColor(.blue)
+                                .bold()
                         }
                     }
                 }
-                
                 Section {
-                    Button(action: {
-                        showingLogoutAlert = true
-                    }) {
-                        HStack {
-                            Text("Logout")
-                                .foregroundColor(.red)
-                            Spacer()
-                            Image(systemName: "arrow.right.square")
-                                .foregroundColor(.red)
-                        }
+                    Button(action: logout) {
+                        Text("Log Out")
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
             }
             .navigationTitle("Profile")
-            .alert(isPresented: $showingLogoutAlert) {
-                Alert(
-                    title: Text("Logout"),
-                    message: Text("Are you sure you want to logout?"),
-                    primaryButton: .destructive(Text("Logout")) {
-                        stateManager.clearState()
-                        // Logout functionality will be implemented later
-                    },
-                    secondaryButton: .cancel()
-                )
+            .sheet(isPresented: $showStatePicker) {
+                StatePickerView(selectedState: $selectedState, states: states)
             }
+        }
+    }
+    
+    func logout() {
+        name = "John Doe"
+        phone = "+1 555-123-4567"
+        email = "johndoe@email.com"
+        selectedState = "California"
+        menuState.closeAllOverlays()
+        presentationMode.wrappedValue.dismiss()
+    }
+}
+
+struct StatePickerView: View {
+    @Binding var selectedState: String
+    let states: [String]
+    @Environment(\.presentationMode) private var presentationMode
+    
+    var body: some View {
+        NavigationView {
+            List(states, id: \.self) { state in
+                HStack {
+                    Text(state)
+                    Spacer()
+                    if state == selectedState {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.blue)
+                    }
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    selectedState = state
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+            .navigationTitle("Select State")
         }
     }
 }
 
 #Preview {
     UserProfileView()
+} 
 } 
