@@ -87,19 +87,19 @@ struct HomeView: View {
                     
                     Button {
                         withAnimation {
-                            menuState.showingEvents = true
+                            menuState.showingBreakingNews = true
                         }
                     } label: {
                         HStack {
-                            Image(systemName: "star.fill")
+                            Image(systemName: "newspaper.fill")
                                 .font(.title2)
                                 .symbolEffect(.bounce, options: .repeating)
-                            Text("Events")
+                            Text("Breaking News")
                                 .font(.headline)
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
-                    .accessibilityHint("Opens events view")
+                    .accessibilityHint("Opens breaking news feed")
                 }
                 .padding(.horizontal, Constants.Padding.large)
                 .padding(.bottom, Constants.Padding.bottom)
