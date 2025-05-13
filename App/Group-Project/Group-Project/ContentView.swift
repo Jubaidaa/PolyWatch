@@ -85,7 +85,7 @@ struct ContentView: View {
 
                             // Local News Section
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("Local News")
+                                Text("Breaking News")
                                     .font(.headline)
                                     .padding(.horizontal)
 
@@ -116,11 +116,11 @@ struct ContentView: View {
 
                                 Button(action: {
                                     withAnimation {
-                                        rootMenuState.showingLocalNews = true
+                                        rootMenuState.showingBreakingNews = true
                                     }
                                 }) {
                                     QuickActionButton(
-                                        title: "Local News",
+                                        title: "Breaking News",
                                         icon: "newspaper.fill",
                                         color: Color(red: 0.2, green: 0.5, blue: 0.8)
                                     )
