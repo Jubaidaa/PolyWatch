@@ -14,74 +14,93 @@ struct CarouselView: View {
     private let timer = Timer.publish(every: 4.5, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: Constants.Dimensions.cornerRadius * 2)
-                .fill(AppColors.blue)
-            
-            if !items.isEmpty {
-                TabView(selection: $currentIndex) {
-                    ForEach(items.indices, id: \.self) { index in
-                        VStack(spacing: Constants.Padding.standard) {
-                            // Use article image if available, otherwise fallback to system image
-                            Group {
-                                if let articleImage = items[index].articleImage {
-                                    AsyncImage(url: URL(string: articleImage)) { phase in
-                                        switch phase {
-                                        case .empty:
-                                            ProgressView()
-                                        case .success(let image):
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                        case .failure:
-                                            Image(systemName: "newspaper")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .foregroundColor(.white)
-                                        @unknown default:
-                                            Image(systemName: "newspaper")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .foregroundColor(.white)
+        GeometryReader { geometry in
+            ZStack {
+                RoundedRectangle(cornerRadius: Constants.Dimensions.cornerRadius * 2)
+                    .fill(AppColors.blue)
+                
+                if !items.isEmpty {
+                    TabView(selection: $currentIndex) {
+                        ForEach(items.indices, id: \ .self) { index in
+                            ZStack(alignment: .bottom) {
+                                // Use article image if available, otherwise fallback to system image
+                                Group {
+                                    if let articleImage = items[index].articleImage {
+                                        AsyncImage(url: URL(string: articleImage)) { phase in
+                                            switch phase {
+                                            case .empty:
+                                                ProgressView()
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: geometry.size.width, height: geometry.size.height)
+                                                    .clipped()
+                                            case .failure:
+                                                Image(systemName: "newspaper")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .foregroundColor(.white)
+                                            @unknown default:
+                                                Image(systemName: "newspaper")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .foregroundColor(.white)
+                                            }
+                                        }
+                                    } else if UIImage(named: items[index].imageName) != nil {
+                                        Image(items[index].imageName)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: geometry.size.width, height: geometry.size.height)
+                                            .clipped()
+                                    } else {
+                                        Image(systemName: "newspaper")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                .accessibilityLabel(items[index].title)
+                                
+                                // Overlay title and dots
+                                VStack(spacing: 16) {
+                                    Spacer()
+                                    Text(items[index].title)
+                                        .font(.title3)
+                                        .multilineTextAlignment(.center)
+                                        .foregroundColor(AppColors.white)
+                                        .padding(.horizontal, Constants.Padding.standard)
+                                        .shadow(radius: 8)
+                                    // Page dots
+                                    HStack(spacing: 8) {
+                                        ForEach(items.indices, id: \ .self) { dotIndex in
+                                            Circle()
+                                                .fill(dotIndex == currentIndex ? Color.white : Color.white.opacity(0.4))
+                                                .frame(width: 8, height: 8)
                                         }
                                     }
-                                } else if UIImage(named: items[index].imageName) != nil {
-                                    Image(items[index].imageName)
-                                        .resizable()
-                                        .scaledToFit()
-                                } else {
-                                    Image(systemName: "newspaper")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .foregroundColor(.white)
+                                    .padding(.bottom, 16)
                                 }
+                                .frame(width: geometry.size.width)
                             }
-                            .frame(height: 180)
-                            .cornerRadius(Constants.Dimensions.cornerRadius)
-                            .accessibilityLabel(items[index].title)
-                            
-                            Text(items[index].title)
-                                .font(.title3)
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(AppColors.white)
-                                .padding(.horizontal, Constants.Padding.standard)
+                            .tag(index)
                         }
-                        .tag(index)
                     }
-                }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
-                .onReceive(timer) { _ in
-                    withAnimation(.easeInOut) {
-                        currentIndex = (currentIndex + 1) % items.count
+                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    .onReceive(timer) { _ in
+                        withAnimation(.easeInOut) {
+                            currentIndex = (currentIndex + 1) % items.count
+                        }
                     }
+                } else {
+                    Text("No items available")
+                        .foregroundColor(AppColors.white)
                 }
-                .padding(24)
-            } else {
-                Text("No items available")
-                    .foregroundColor(AppColors.white)
             }
+            .clipShape(RoundedRectangle(cornerRadius: Constants.Dimensions.cornerRadius * 2))
         }
-        .frame(height: 400)
+        .aspectRatio(16/9, contentMode: .fit)
     }
 }
 
