@@ -5,11 +5,8 @@ struct HomeView: View {
     @EnvironmentObject private var menuState: MenuState
     let onLogoTap: () -> Void
     
-    private let carouselItems: [CarouselItem] = [
-        CarouselItem(title: "Breaking News: SwiftUI Tips", imageName: "newspaper.fill"),
-        CarouselItem(title: "Latest Trends in Tech", imageName: "gear"),
-        CarouselItem(title: "Inside PolyWatch Updates", imageName: "info.circle")
-    ]
+    // Add HomeViewModel to fetch RSS feed data
+    @StateObject private var homeViewModel = HomeViewModel()
     
     var body: some View {
         ZStack {
@@ -30,8 +27,20 @@ struct HomeView: View {
                 Spacer()
                 
                 // MARK: - Carousel
-                CarouselView(items: carouselItems, currentIndex: $currentIndex)
-                    .padding(.horizontal, Constants.Padding.standard)
+                if homeViewModel.isLoading {
+                    ProgressView("Loading news...")
+                        .frame(height: 400)
+                } else {
+                    let carouselItems = homeViewModel.getCarouselItems().map { article in
+                        CarouselItem(
+                            title: article.title,
+                            imageName: "newspaper",
+                            articleImage: article.image
+                        )
+                    }
+                    CarouselView(items: carouselItems, currentIndex: $currentIndex)
+                        .padding(.horizontal, Constants.Padding.standard)
+                }
                 
                 Spacer()
                 
@@ -66,6 +75,10 @@ struct HomeView: View {
                 .padding(.horizontal, Constants.Padding.large)
                 .padding(.bottom, Constants.Padding.bottom)
             }
+        }
+        .task {
+            // Fetch RSS feed data when the view appears
+            await homeViewModel.fetchCarouselNews()
         }
     }
 }

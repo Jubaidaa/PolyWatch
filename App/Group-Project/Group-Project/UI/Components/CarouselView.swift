@@ -4,6 +4,7 @@ struct CarouselItem: Identifiable {
     let id = UUID()
     let title: String
     let imageName: String
+    let articleImage: String?
 }
 
 struct CarouselView: View {
@@ -21,9 +22,30 @@ struct CarouselView: View {
                 TabView(selection: $currentIndex) {
                     ForEach(items.indices, id: \.self) { index in
                         VStack(spacing: Constants.Padding.standard) {
-                            // Fallback to system image if asset not found
+                            // Use article image if available, otherwise fallback to system image
                             Group {
-                                if UIImage(named: items[index].imageName) != nil {
+                                if let articleImage = items[index].articleImage {
+                                    AsyncImage(url: URL(string: articleImage)) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            ProgressView()
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                        case .failure:
+                                            Image(systemName: "newspaper")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .foregroundColor(.white)
+                                        @unknown default:
+                                            Image(systemName: "newspaper")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .foregroundColor(.white)
+                                        }
+                                    }
+                                } else if UIImage(named: items[index].imageName) != nil {
                                     Image(items[index].imageName)
                                         .resizable()
                                         .scaledToFit()
@@ -67,8 +89,8 @@ struct CarouselView_Previews: PreviewProvider {
     static var previews: some View {
         CarouselView(
             items: [
-                CarouselItem(title: "Test 1", imageName: "newspaper"),
-                CarouselItem(title: "Test 2", imageName: "newspaper")
+                CarouselItem(title: "Test 1", imageName: "newspaper", articleImage: nil),
+                CarouselItem(title: "Test 2", imageName: "newspaper", articleImage: nil)
             ],
             currentIndex: .constant(0)
         )
