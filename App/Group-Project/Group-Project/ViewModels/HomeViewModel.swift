@@ -1,6 +1,10 @@
 import SwiftUI
 import Combine
 
+// Import RSSItem type
+@_exported import struct Foundation.URL
+import FeedKit
+
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var carouselArticles: [RSSItem] = []
