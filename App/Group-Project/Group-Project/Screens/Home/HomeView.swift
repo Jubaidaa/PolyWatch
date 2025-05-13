@@ -24,8 +24,6 @@ struct HomeView: View {
                     onSearchTap: {}
                 )
                 
-                Spacer()
-                
                 // MARK: - Carousel
                 Group {
                     if homeViewModel.isLoading {
@@ -55,8 +53,6 @@ struct HomeView: View {
                         }
                     }
                 }
-                
-                Spacer()
                 
                 // MARK: - Navigation Buttons
                 VStack(spacing: Constants.Padding.standard) {
