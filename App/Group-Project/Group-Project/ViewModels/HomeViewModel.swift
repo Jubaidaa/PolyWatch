@@ -11,66 +11,57 @@ class HomeViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
     
-    private let rssService = RSSService()
-    private let bbcWorldNewsFeed = "https://feeds.bbci.co.uk/news/world/rss.xml"
-    private let newsState = NewsState.shared
+    // Breaking news feeds for the home view
+    let breakingNewsFeeds = [
+        "Progressive": "https://progressive.org/magazine/rss-feeds/",
+        "OpEdNews": "https://www.opednews.com/feeds/rss.xml",
+        "Al Jazeera": "https://www.aljazeera.com/xml/rss/all.xml",
+        "France24": "https://www.france24.com/en/rss",
+        "GlobalIssues": "https://www.globalissues.org/news/feed"
+    ]
     
-    init() {
-        // Initialize with empty data
-    }
-    
+    // Fetch breaking news for home
     func fetchCarouselNews() async {
         isLoading = true
         error = nil
+        var allArticles: [RSSItem] = []
         
-        do {
-            try await rssService.fetchRSS(from: bbcWorldNewsFeed)
-            
-            // Filter articles to only include those with valid images
-            let articlesWithImages = rssService.items.filter { item in
-                if let imageUrl = item.imageUrl?.absoluteString {
-                    // Check if the URL is valid and not empty
-                    return !imageUrl.isEmpty && URL(string: imageUrl) != nil
+        await withTaskGroup(of: [RSSItem]?.self) { group in
+            for (_, feed) in breakingNewsFeeds {
+                group.addTask {
+                    let service = RSSService()
+                    do {
+                        try await service.fetchRSS(from: feed)
+                        // Filter for articles with images
+                        return service.items.filter { item in
+                            if let imageUrl = item.imageUrl?.absoluteString {
+                                return !imageUrl.isEmpty && URL(string: imageUrl) != nil
+                            }
+                            return false
+                        }
+                    } catch {
+                        print("Error fetching feed: \(error)")
+                        return nil
+                    }
                 }
-                return false
             }
-            
-            // Get up to 5 articles with images for the carousel
-            let articles = articlesWithImages.prefix(5).map { $0 }
-            
-            withAnimation {
-                self.carouselArticles = articles
-                self.isLoading = false
+            for await result in group {
+                if let items = result {
+                    allArticles.append(contentsOf: items)
+                }
             }
-            
-            print("Fetched \(articles.count) BBC news articles with images for carousel")
-        } catch {
-            self.error = error
-            self.isLoading = false
-            print("Error fetching BBC news: \(error)")
         }
+        // Limit to 5 articles for the carousel
+        let limitedArticles = allArticles.prefix(5)
+        withAnimation {
+            self.carouselArticles = Array(limitedArticles)
+            self.isLoading = false
+        }
+        print("Fetched \(self.carouselArticles.count) breaking news articles with images for carousel")
     }
     
     // Convert RSSItems to ArticleItems for the carousel
     func getCarouselItems() -> [ArticleItem] {
-        // Combine breaking news and local news articles
-        let allArticles = newsState.getArticlesWithImages()
-        
-        // If we have breaking news articles, use those first
-        if !allArticles.isEmpty {
-            return allArticles.prefix(5).map { item in
-                ArticleItem(
-                    title: item.title,
-                    image: item.imageUrl?.absoluteString ?? "",
-                    date: formatDate(item.pubDate),
-                    source: item.source,
-                    description: item.description,
-                    link: item.link
-                )
-            }
-        }
-        
-        // Fallback to carousel articles if no breaking news
         return carouselArticles.map { item in
             ArticleItem(
                 title: item.title,
@@ -87,7 +78,6 @@ class HomeViewModel: ObservableObject {
         guard let date = date else {
             return "Recently"
         }
-        
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
         return formatter.localizedString(for: date, relativeTo: Date())
