@@ -7,6 +7,8 @@ struct HomeView: View {
     
     // Add HomeViewModel to fetch RSS feed data
     @StateObject private var homeViewModel = HomeViewModel()
+    // Add BreakingNewsPreviewViewModel for Local News section
+    @StateObject private var breakingNewsPreviewVM = BreakingNewsPreviewViewModel()
     
     var body: some View {
         ZStack {
@@ -59,8 +61,8 @@ struct HomeView: View {
                     Text("Local News")
                         .font(.headline)
                         .padding(.horizontal)
-
-                    let newsToShow = homeViewModel.getBreakingNewsItemsForLocalSection().prefix(3)
+                    
+                    let newsToShow = breakingNewsPreviewVM.getBreakingNewsItems().prefix(3)
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
                             ForEach(Array(newsToShow.enumerated()), id: \ .element.id) { (index, article) in
@@ -106,7 +108,7 @@ struct HomeView: View {
         .task {
             // Fetch RSS feed data when the view appears
             await homeViewModel.fetchCarouselNews()
-            await homeViewModel.fetchBreakingNewsForLocalSection()
+            await breakingNewsPreviewVM.fetchBreakingNews()
         }
     }
 }
