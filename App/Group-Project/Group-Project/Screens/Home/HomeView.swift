@@ -33,8 +33,7 @@ struct HomeView: View {
                         let carouselItems = homeViewModel.getCarouselItems().map { article in
                             CarouselItem(
                                 title: article.title,
-                                imageName: "newspaper",
-                                articleImage: article.image
+                                imageUrl: article.image
                             )
                         }
                         if carouselItems.isEmpty {
@@ -48,7 +47,7 @@ struct HomeView: View {
                             }
                             .frame(height: 220)
                         } else {
-                            CarouselView(items: carouselItems, currentIndex: $currentIndex)
+                            FixedCarouselView(items: carouselItems, currentIndex: $currentIndex)
                                 .frame(width: 300, height: 180)
                                 .padding(.horizontal, Constants.Padding.standard)
                         }
