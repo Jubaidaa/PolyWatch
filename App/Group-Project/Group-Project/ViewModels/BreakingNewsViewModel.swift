@@ -45,18 +45,38 @@ class BreakingNewsViewModel: ObservableObject {
 
     private func rotateToNextArticles() {
         var nextArticles: [RSSItem] = []
-        for (source, articles) in articlesBySource {
+        let sourcesWithArticles = articlesBySource.filter { !$0.value.isEmpty }
+        
+        // First, try to include one article from each source that has articles
+        for (source, articles) in sourcesWithArticles {
             guard !articles.isEmpty else { continue }
             let currentIndex = currentIndexBySource[source] ?? 0
-            for offset in 0..<articlesPerSource {
-                let index = (currentIndex + offset) % articles.count
-                if index < articles.count {
-                    nextArticles.append(articles[index])
-                }
-            }
-            let newIndex = (currentIndex + articlesPerSource) % max(1, articles.count)
+            let index = currentIndex % articles.count
+            nextArticles.append(articles[index])
+            
+            // Update index for this source
+            let newIndex = (currentIndex + 1) % max(1, articles.count)
             currentIndexBySource[source] = newIndex
         }
+        
+        // If we have space for more articles, add additional ones
+        let maxArticlesToShow = min(10, sourcesWithArticles.values.reduce(0) { $0 + $1.count })
+        if nextArticles.count < maxArticlesToShow {
+            var additionalArticles: [RSSItem] = []
+            for (source, articles) in sourcesWithArticles {
+                if articles.count > 1 {
+                    let startIndex = (currentIndexBySource[source] ?? 0) + 1
+                    for offset in 0..<min(2, articles.count - 1) {
+                        let index = (startIndex + offset) % articles.count
+                        additionalArticles.append(articles[index])
+                    }
+                }
+            }
+            // Shuffle additional articles for variety
+            additionalArticles.shuffle()
+            nextArticles.append(contentsOf: additionalArticles.prefix(maxArticlesToShow - nextArticles.count))
+        }
+        
         withAnimation(.easeInOut(duration: 0.5)) {
             currentArticles = nextArticles
             // Update shared state with all breaking news articles
@@ -83,7 +103,18 @@ class BreakingNewsViewModel: ObservableObject {
                             }
                             return false
                         }
-                        return (source, articlesWithImages)
+                        // Create new items with the correct source instead of modifying existing ones
+                        let articlesWithSource = articlesWithImages.map { item in
+                            RSSItem(
+                                title: item.title,
+                                link: item.link,
+                                pubDate: item.pubDate,
+                                description: item.description,
+                                imageUrl: item.imageUrl,
+                                source: source
+                            )
+                        }
+                        return (source, articlesWithSource)
                     } catch {
                         print("Error fetching \(source) feed: \(error)")
                         return nil
@@ -97,6 +128,34 @@ class BreakingNewsViewModel: ObservableObject {
                 }
             }
         }
+        
+        // Ensure at least one article from each source is shown initially
+        var initialArticles: [RSSItem] = []
+        for (_, articles) in articlesBySource {
+            if !articles.isEmpty {
+                initialArticles.append(articles[0])
+            }
+        }
+        
+        // If we have space for more articles, add them
+        let remainingSlots = max(0, 10 - initialArticles.count)
+        if remainingSlots > 0 {
+            var additionalArticles: [RSSItem] = []
+            for (_, articles) in articlesBySource {
+                if articles.count > 1 {
+                    additionalArticles.append(contentsOf: articles.dropFirst().prefix(1))
+                }
+            }
+            initialArticles.append(contentsOf: additionalArticles.prefix(remainingSlots))
+        }
+        
+        // Update current articles
+        withAnimation {
+            currentArticles = initialArticles
+            // Update shared state with all breaking news articles
+            newsState.updateBreakingNews(articlesBySource.values.flatMap { $0 })
+        }
+        
         setupRotationTimer()
         isLoading = false
     }

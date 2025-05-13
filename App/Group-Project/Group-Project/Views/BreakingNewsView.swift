@@ -7,44 +7,51 @@ struct BreakingNewsView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .bottomTrailing) {
-                Color(.systemBackground)
+                AppColors.white
                     .ignoresSafeArea()
                     
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Header
-                        VStack(spacing: 8) {
-                            Text("Breaking News")
-                                .font(.system(size: 34, weight: .bold))
-                        }
-                        .padding(.top, 20)
-                        .padding(.bottom, 10)
+                VStack(spacing: 0) {
+                    // Top bar is already handled by the navigation
+                    
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            // Header
+                            VStack(spacing: 8) {
+                                Text("Breaking News")
+                                    .font(.system(size: 28, weight: .bold))
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                            }
+                            .padding(.top, 8)
+                            .padding(.bottom, 10)
 
-                        if viewModel.isLoading {
-                            ProgressView("Loading breaking news...")
-                                .padding()
-                        } else if viewModel.currentArticles.isEmpty {
-                            VStack(spacing: 12) {
-                                Image(systemName: "bolt.horizontal.fill")
-                                    .font(.largeTitle)
-                                    .foregroundColor(.gray)
-                                Text("No breaking news available.")
-                                    .font(.headline)
-                                    .foregroundColor(.gray)
-                            }
-                            .padding()
-                            .frame(height: 300)
-                        } else {
-                            LazyVStack(spacing: 20) {
-                                ForEach(viewModel.currentArticles) { article in
-                                    NewsItemView(item: article)
-                                        .id(article.id)
+                            if viewModel.isLoading {
+                                ProgressView("Loading breaking news...")
+                                    .padding()
+                                    .frame(height: 200)
+                            } else if viewModel.currentArticles.isEmpty {
+                                VStack(spacing: 12) {
+                                    Image(systemName: "bolt.horizontal.fill")
+                                        .font(.largeTitle)
+                                        .foregroundColor(.gray)
+                                    Text("No breaking news available.")
+                                        .font(.headline)
+                                        .foregroundColor(.gray)
                                 }
-                                Spacer().frame(height: 60)
+                                .padding()
+                                .frame(height: 300)
+                            } else {
+                                LazyVStack(spacing: 20) {
+                                    ForEach(viewModel.currentArticles) { article in
+                                        NewsItemView(item: article)
+                                            .id(article.id)
+                                    }
+                                    Spacer().frame(height: 60)
+                                }
+                                .padding(.horizontal)
+                                .animation(.easeInOut(duration: 0.5), value: viewModel.currentArticles)
                             }
-                            .padding(.horizontal)
-                            .animation(.easeInOut(duration: 0.5), value: viewModel.currentArticles)
                         }
+                        .padding(.horizontal)
                     }
                 }
             }
@@ -56,7 +63,8 @@ struct BreakingNewsView: View {
                             menuState.closeAllOverlays()
                         }
                     }) {
-                        Text("Close")
+                        Image(systemName: "xmark")
+                            .font(.system(size: 18))
                             .fontWeight(.bold)
                             .foregroundColor(AppColors.red)
                     }

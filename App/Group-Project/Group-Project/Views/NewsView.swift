@@ -102,6 +102,10 @@ struct NewsItemView: View {
                     .background(
                         Capsule()
                             .fill(colorForSource(item.source).opacity(0.15))
+                            .overlay(
+                                Capsule()
+                                    .stroke(colorForSource(item.source).opacity(0.3), lineWidth: 1)
+                            )
                     )
                     .foregroundColor(colorForSource(item.source).opacity(0.9))
             }
@@ -140,6 +144,10 @@ struct NewsItemView: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.systemBackground))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.black.opacity(0.2), lineWidth: 1)
+                )
                 .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 2)
         )
         .contentShape(Rectangle())

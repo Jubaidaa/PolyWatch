@@ -7,7 +7,6 @@ import Combine
 struct VoterRegistrationView: View {
     @EnvironmentObject private var menuState: MenuState
     @State private var selectedSection: InfoSection = .registration
-    @State private var showingDetailView = false
     @State private var selectedDetail: DetailInfo?
     @State private var showingHelpView = false
     
@@ -48,13 +47,16 @@ struct VoterRegistrationView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") {
+                    Button {
                         withAnimation {
                             menuState.showingVoterRegistration = false
                             menuState.showingHelp = false
                         }
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 18))
+                            .foregroundColor(AppColors.blue)
                     }
-                    .foregroundColor(AppColors.blue)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -106,10 +108,8 @@ struct VoterRegistrationView: View {
                         ],
                         links: [("Register Now", "https://registertovote.ca.gov/")]
                     )
-                    showingDetailView = true
                 },
-                actionText: "View Guide",
-                showsDetailIndicator: true
+                actionText: "View Guide"
             )
             
             InfoCard(
@@ -142,10 +142,8 @@ struct VoterRegistrationView: View {
                             ("Find County Office", "https://www.sos.ca.gov/elections/voting-resources/county-elections-offices")
                         ]
                     )
-                    showingDetailView = true
                 },
-                actionText: "View Instructions",
-                showsDetailIndicator: true
+                actionText: "View Instructions"
             )
             
             InfoCard(
@@ -180,10 +178,8 @@ struct VoterRegistrationView: View {
                         ],
                         links: [("Find Voting Location", "https://www.sos.ca.gov/elections/polling-place")]
                     )
-                    showingDetailView = true
                 },
-                actionText: "Learn More",
-                showsDetailIndicator: true
+                actionText: "Learn More"
             )
             
             InfoCard(
@@ -218,10 +214,8 @@ struct VoterRegistrationView: View {
                             ("Track Ballot", "https://california.ballottrax.net/voter/")
                         ]
                     )
-                    showingDetailView = true
                 },
-                actionText: "Check Now",
-                showsDetailIndicator: true
+                actionText: "Check Now"
             )
         }
         .padding()
@@ -283,20 +277,17 @@ struct InfoCard: View {
     let description: String
     let action: (() -> Void)?
     let actionText: String?
-    let showsDetailIndicator: Bool
     
     init(
         title: String,
         description: String,
         action: (() -> Void)? = nil,
-        actionText: String? = nil,
-        showsDetailIndicator: Bool = false
+        actionText: String? = nil
     ) {
         self.title = title
         self.description = description
         self.action = action
         self.actionText = actionText
-        self.showsDetailIndicator = showsDetailIndicator
     }
     
     var body: some View {
@@ -304,12 +295,6 @@ struct InfoCard: View {
             HStack {
                 Text(title)
                     .font(.headline)
-                
-                if showsDetailIndicator {
-                    Spacer()
-                    Image(systemName: "info.circle")
-                        .foregroundColor(.secondary)
-                }
             }
             
             Text(description)

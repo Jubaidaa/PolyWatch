@@ -52,6 +52,10 @@ struct CarouselView: View {
                     .frame(width: 140)
                     .background(Color(.systemBackground))
                     .cornerRadius(16)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.black.opacity(0.2), lineWidth: 1)
+                    )
                     .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
                 }
             }

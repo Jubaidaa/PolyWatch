@@ -82,7 +82,26 @@ struct ContentView: View {
                                     }
                                 }
                                 .frame(height: 320)
-                                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+                                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                                .overlay(
+                                    // Dynamic position indicator
+                                    ZStack {
+                                        // Background track
+                                        Rectangle()
+                                            .fill(Color.white.opacity(0.3))
+                                            .frame(width: CGFloat(articlesToShow.count * 10), height: 3)
+                                            .cornerRadius(1.5)
+                                        
+                                        // Active indicator that moves
+                                        Rectangle()
+                                            .fill(Color.white.opacity(0.9))
+                                            .frame(width: 10, height: 3)
+                                            .cornerRadius(1.5)
+                                            .offset(x: CGFloat(currentArticleIndex - articlesToShow.count/2) * 10)
+                                    }
+                                    .padding(.bottom, 8),
+                                    alignment: .bottom
+                                )
                             }
 
                             // Local News Section
@@ -112,19 +131,19 @@ struct ContentView: View {
                                 })) {
                                     QuickActionButton(
                                         title: "Upcoming\nElections",
-                                        icon: "calendar",
+                                        icon: "star.fill",
                                         color: Color(red: 0.2, green: 0.5, blue: 0.8)
                                     )
                                 }
 
                                 Button(action: {
                                     withAnimation {
-                                        rootMenuState.showingBreakingNews = true
+                                        rootMenuState.showingEvents = true
                                     }
                                 }) {
                                     QuickActionButton(
-                                        title: "Breaking News",
-                                        icon: "newspaper.fill",
+                                        title: "Upcoming\nEvents",
+                                        icon: "calendar",
                                         color: Color(red: 0.2, green: 0.5, blue: 0.8)
                                     )
                                 }
@@ -173,7 +192,7 @@ struct ContentView: View {
             }
             .fullScreenCover(isPresented: $rootMenuState.showingEvents) {
                 EventsView(isModal: true)
-                .environmentObject(rootMenuState)
+                    .environmentObject(rootMenuState)
             }
             .fullScreenCover(isPresented: $rootMenuState.showingCalendar) {
                 ElectionCalendarView(onLogoTap: {
@@ -317,6 +336,10 @@ struct QuickActionButton: View {
         .frame(height: 100)
         .background(color)
         .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.black.opacity(0.2), lineWidth: 1)
+        )
     }
 }
 
@@ -360,6 +383,10 @@ struct ActivityCard: View {
         .frame(width: 140, height: 140)
         .background(Color(.systemBackground))
         .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.black.opacity(0.2), lineWidth: 1)
+        )
         .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
 }
@@ -418,6 +445,10 @@ struct LocalNewsCard: View {
         .frame(width: 140, height: 140)
         .background(Color(.systemBackground))
         .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.black.opacity(0.2), lineWidth: 1)
+        )
         .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
         .onTapGesture { showDetail = true }
         .sheet(isPresented: $showDetail) {

@@ -19,21 +19,33 @@ class BreakingNewsPreviewViewModel: ObservableObject {
     func fetchBreakingNews() async {
         isLoading = true
         error = nil
-        var allArticles: [RSSItem] = []
+        var articlesBySource: [String: [RSSItem]] = [:]
 
-        await withTaskGroup(of: [RSSItem]?.self) { group in
-            for (_, feed) in breakingNewsFeeds {
+        await withTaskGroup(of: (String, [RSSItem])?.self) { group in
+            for (source, feed) in breakingNewsFeeds {
                 group.addTask {
                     let service = RSSService()
                     do {
                         try await service.fetchRSS(from: feed)
                         // Filter for articles with images
-                        return service.items.filter { item in
+                        let articlesWithImages = service.items.filter { item in
                             if let imageUrl = item.imageUrl?.absoluteString {
                                 return !imageUrl.isEmpty && URL(string: imageUrl) != nil
                             }
                             return false
                         }
+                        // Create new items with the correct source instead of modifying existing ones
+                        let articlesWithSource = articlesWithImages.map { item in
+                            RSSItem(
+                                title: item.title,
+                                link: item.link,
+                                pubDate: item.pubDate,
+                                description: item.description,
+                                imageUrl: item.imageUrl,
+                                source: source
+                            )
+                        }
+                        return (source, articlesWithSource)
                     } catch {
                         print("Error fetching feed: \(error)")
                         return nil
@@ -41,14 +53,34 @@ class BreakingNewsPreviewViewModel: ObservableObject {
                 }
             }
             for await result in group {
-                if let items = result {
-                    allArticles.append(contentsOf: items)
+                if let (source, items) = result, !items.isEmpty {
+                    articlesBySource[source] = items
                 }
             }
         }
-        // Limit to 10 articles for the local news section
-        let limitedArticles = allArticles.prefix(10)
-        self.breakingNewsArticles = Array(limitedArticles)
+        
+        // Ensure at least one article from each source
+        var selectedArticles: [RSSItem] = []
+        for (_, articles) in articlesBySource {
+            if !articles.isEmpty {
+                selectedArticles.append(articles[0])
+            }
+        }
+        
+        // If we need more articles to reach our limit, add additional ones
+        if selectedArticles.count < 10 {
+            var additionalArticles: [RSSItem] = []
+            for (_, articles) in articlesBySource {
+                if articles.count > 1 {
+                    additionalArticles.append(contentsOf: articles.dropFirst())
+                }
+            }
+            // Shuffle additional articles for variety
+            additionalArticles.shuffle()
+            selectedArticles.append(contentsOf: additionalArticles.prefix(10 - selectedArticles.count))
+        }
+        
+        self.breakingNewsArticles = selectedArticles
         isLoading = false
         print("Fetched \(self.breakingNewsArticles.count) breaking news articles with images for local news section")
     }

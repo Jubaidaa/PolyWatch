@@ -64,10 +64,13 @@ struct HelpSidebarView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") {
+                    Button {
                         menuState.returnToMainView()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 18))
+                            .foregroundColor(AppColors.blue)
                     }
-                    .foregroundColor(AppColors.blue)
                 }
             }
             .sheet(item: $selectedDetail) { detail in

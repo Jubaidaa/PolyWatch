@@ -632,12 +632,15 @@ struct ElectionCalendarView: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(AppColors.red)
                         }
-                        Button("Close") {
+                        Button {
                             withAnimation {
                                 menuState.showingCalendar = false
                             }
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 18))
+                                .foregroundColor(AppColors.blue)
                         }
-                        .foregroundColor(AppColors.blue)
                     }
                 }
             }
@@ -1022,8 +1025,12 @@ struct CalendarEventDetailView: View {
                 .padding()
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: Button("Close") {
+            .navigationBarItems(trailing: Button {
                 dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 18))
+                    .foregroundColor(.blue)
             })
         }
     }
