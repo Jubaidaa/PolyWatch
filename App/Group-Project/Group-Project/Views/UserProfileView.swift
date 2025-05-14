@@ -7,6 +7,7 @@ struct UserProfileView: View {
     @AppStorage("profileState") private var selectedState: String = "California"
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var menuState: MenuState
+    @EnvironmentObject private var notificationService: NotificationService
     
     let states = [
         "Alabama", "Alaska", "Arizona", "Arkansas", "California",
@@ -22,6 +23,7 @@ struct UserProfileView: View {
     ]
     
     @State private var showStatePicker = false
+    @State private var showNotificationSettings = false
     
     var body: some View {
         NavigationView {
@@ -44,6 +46,7 @@ struct UserProfileView: View {
                         }
                     }
                 }
+                
                 Section(header: Text("State")) {
                     Button(action: { showStatePicker = true }) {
                         HStack {
@@ -55,6 +58,31 @@ struct UserProfileView: View {
                         }
                     }
                 }
+                
+                Section(header: Text("Notifications")) {
+                    Button(action: { showNotificationSettings = true }) {
+                        HStack {
+                            Image(systemName: "bell.fill")
+                                .foregroundColor(.red)
+                            Text("Notification Settings")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.gray)
+                                .font(.system(size: 14))
+                        }
+                    }
+                    
+                    Button(action: {
+                        notificationService.scheduleImmediateNotification()
+                    }) {
+                        HStack {
+                            Image(systemName: "bell.badge.fill")
+                                .foregroundColor(.red)
+                            Text("Send Test Notification")
+                        }
+                    }
+                }
+                
                 Section {
                     Button(action: logout) {
                         Text("Log Out")
@@ -66,6 +94,9 @@ struct UserProfileView: View {
             .navigationTitle("Profile")
             .sheet(isPresented: $showStatePicker) {
                 StatePickerView(selectedState: $selectedState, states: states)
+            }
+            .sheet(isPresented: $showNotificationSettings) {
+                NotificationSettingsView()
             }
         }
     }
@@ -109,4 +140,6 @@ struct StatePickerView: View {
 
 #Preview {
     UserProfileView()
+        .environmentObject(MenuState())
+        .environmentObject(NotificationService())
 } 
