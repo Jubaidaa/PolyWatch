@@ -60,7 +60,7 @@ struct UpcomingView: View {
                     ProgressView("Loading elections...")
                     Spacer()
                     
-                } else if let error = viewModel.error {
+                } else if viewModel.error != nil {
                     Spacer()
                     VStack(spacing: Constants.Padding.standard) {
                         Text("😕")
@@ -118,7 +118,7 @@ struct UpcomingView: View {
                                     menuState.returnToMainView()
                                 }
                             },
-                                    showTopBar: true,
+                                    showTopBar: false,
                                     isEmbedded: true
                         )
                                 .environmentObject(menuState)
