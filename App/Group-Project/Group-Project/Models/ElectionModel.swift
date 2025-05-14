@@ -48,7 +48,7 @@ struct ElectionsResponse: Codable {
     let elections: [Election]
 }
 
-enum ElectionError: Error {
+enum ElectionError: Error, Equatable {
     case invalidURL
     case invalidResponse
     case invalidData

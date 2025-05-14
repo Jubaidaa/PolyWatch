@@ -203,7 +203,7 @@ struct ContentView: View {
             }
             .fullScreenCover(isPresented: $rootMenuState.showingEvents) {
                 EventsView(isModal: true)
-                    .environmentObject(rootMenuState)
+                .environmentObject(rootMenuState)
             }
             .fullScreenCover(isPresented: $rootMenuState.showingCalendar) {
                 ElectionCalendarView(onLogoTap: {

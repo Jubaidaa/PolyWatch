@@ -64,8 +64,8 @@ class BreakingNewsPreviewViewModel: ObservableObject {
         for (_, articles) in articlesBySource {
             if !articles.isEmpty {
                 selectedArticles.append(articles[0])
+                }
             }
-        }
         
         // If we need more articles to reach our limit, add additional ones
         if selectedArticles.count < 10 {

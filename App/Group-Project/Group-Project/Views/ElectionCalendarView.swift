@@ -516,16 +516,6 @@ struct ElectionCalendarView: View {
                 Color(.systemBackground)
                     .ignoresSafeArea()
                 
-                // This overlay will hide the blue back button
-                VStack {
-                    Rectangle()
-                        .fill(AppColors.red)
-                        .frame(height: 50)
-                        .edgesIgnoringSafeArea(.top)
-                    Spacer()
-                }
-                .zIndex(99)
-
                 VStack(spacing: 16) {
                     if showTopBar {
                         TopBarView(
@@ -541,8 +531,8 @@ struct ElectionCalendarView: View {
                                 if isEmbedded {
                                     presentationMode.wrappedValue.dismiss()
                                 } else {
-                                    withAnimation {
-                                        menuState.returnToMainView()
+                                withAnimation {
+                                    menuState.returnToMainView()
                                     }
                                 }
                             }
@@ -641,36 +631,6 @@ struct ElectionCalendarView: View {
             }
             .navigationBarHidden(true)
             .navigationBarBackButtonHidden(true)
-            .navigationBarTitle("", displayMode: .inline)
-            .navigationBarItems(leading: EmptyView())
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    HStack {
-                        Button(action: {
-                            withAnimation {
-                                menuState.closeAllOverlays()
-                            }
-                        }) {
-                            Text("PolyWatch")
-                                .fontWeight(.bold)
-                                .foregroundColor(AppColors.red)
-                        }
-                        Button {
-                            withAnimation {
-                                if isEmbedded {
-                                    presentationMode.wrappedValue.dismiss()
-                                } else {
-                                    menuState.showingCalendar = false
-                                }
-                            }
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 18))
-                                .foregroundColor(AppColors.blue)
-                        }
-                    }
-                }
-            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

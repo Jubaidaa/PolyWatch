@@ -53,7 +53,7 @@ struct VoterRegistrationView: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 18))
-                            .foregroundColor(AppColors.blue)
+                    .foregroundColor(AppColors.blue)
                     }
                 }
                 
@@ -266,7 +266,7 @@ struct DetailView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
-                        dismiss()
+                    dismiss()
                     }
                 }
             }

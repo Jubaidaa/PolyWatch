@@ -112,10 +112,10 @@ struct ArticleDetailView: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 18))
-                            .foregroundColor(.blue)
-                            .padding(8)
-                            .background(Color.white.opacity(0.8))
-                            .clipShape(Circle())
+                    .foregroundColor(.blue)
+                    .padding(8)
+                    .background(Color.white.opacity(0.8))
+                    .clipShape(Circle())
                     }
                 }
             }

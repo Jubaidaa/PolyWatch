@@ -14,7 +14,7 @@ struct NotificationSettingsView: View {
             Form {
                 Section(header: Text("Notification Settings")) {
                     Toggle("Enable Notifications", isOn: $isNotificationsEnabled)
-                        .onChange(of: isNotificationsEnabled) { newValue in
+                        .onChange(of: isNotificationsEnabled) { _, newValue in
                             if newValue {
                                 notificationService.requestAuthorization()
                             } else {
@@ -28,7 +28,7 @@ struct NotificationSettingsView: View {
                                 Text(frequencies[index]).tag(index)
                             }
                         }
-                        .onChange(of: selectedFrequency) { newValue in
+                        .onChange(of: selectedFrequency) { _, newValue in
                             notificationService.updateNotificationFrequency(frequencyValues[newValue])
                         }
                     }

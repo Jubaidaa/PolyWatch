@@ -33,13 +33,13 @@ struct EventsView: View {
                     .font(.system(size: 28, weight: .bold))
                     .padding(.top, 8)
                     .frame(maxWidth: .infinity, alignment: .center)
-                
-                // Search Bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
+            
+            // Search Bar
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
                     
-                    TextField("Search events...", text: $searchText)
+                TextField("Search events...", text: $searchText)
                         .font(.system(size: 16))
                     
                     if !searchText.isEmpty {
@@ -50,13 +50,13 @@ struct EventsView: View {
                                 .foregroundColor(.gray)
                         }
                     }
-                }
+            }
                 .padding(10)
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
                 .padding(.horizontal)
                 .padding(.top, 8)
-                
+            
                 // Filter Buttons
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -107,65 +107,65 @@ struct EventsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color(.systemBackground))
             } else {
-                List(filteredEvents) { event in
-                    Button(action: {
-                        selectedEvent = event
-                        showDetail = true
-                    }) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            if let imageURL = event.imageURL, let url = URL(string: imageURL) {
-                                HStack {
-                                    Spacer()
-                                    AsyncImage(url: url) { image in
-                                        image.resizable().aspectRatio(contentMode: .fill)
-                                    } placeholder: {
-                                        Rectangle().fill(Color.gray.opacity(0.2))
-                                    }
-                                    .frame(width: 140, height: 120)
-                                    .clipped()
-                                    .cornerRadius(16)
-                                    Spacer()
+            List(filteredEvents) { event in
+                Button(action: {
+                    selectedEvent = event
+                    showDetail = true
+                }) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        if let imageURL = event.imageURL, let url = URL(string: imageURL) {
+                            HStack {
+                                Spacer()
+                                AsyncImage(url: url) { image in
+                                    image.resizable().aspectRatio(contentMode: .fill)
+                                } placeholder: {
+                                    Rectangle().fill(Color.gray.opacity(0.2))
                                 }
+                                .frame(width: 140, height: 120)
+                                .clipped()
+                                .cornerRadius(16)
+                                Spacer()
                             }
-                            Text(event.title)
-                                .font(.title3)
-                                .fontWeight(.bold)
-                            Text(event.shortFormattedDate)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            Text(event.location)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
                         }
-                        .padding()
-                        .background(Color(.systemBackground))
-                        .cornerRadius(18)
+                        Text(event.title)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                        Text(event.shortFormattedDate)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        Text(event.location)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(18)
                         .overlay(
                             RoundedRectangle(cornerRadius: 18)
                                 .stroke(Color.black.opacity(0.2), lineWidth: 1)
                         )
-                        .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
-                        .frame(maxWidth: 360)
-                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 0)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
+                    .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
+                    .frame(maxWidth: 360)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 0)
                 }
-                .listStyle(PlainListStyle())
+                .buttonStyle(PlainButtonStyle())
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+            }
+            .listStyle(PlainListStyle())
             }
         }
         .navigationBarBackButtonHidden(true)
-        .onAppear {
-            Task { await viewModel.loadEvents() }
-        }
-        .sheet(isPresented: $showDetail) {
-            if let event = selectedEvent {
-                EventDetailSheet(event: event)
+            .onAppear {
+                Task { await viewModel.loadEvents() }
             }
-        }
+            .sheet(isPresented: $showDetail) {
+                if let event = selectedEvent {
+                    EventDetailSheet(event: event)
+                }
+            }
     }
     
     // MARK: - Filtering Logic

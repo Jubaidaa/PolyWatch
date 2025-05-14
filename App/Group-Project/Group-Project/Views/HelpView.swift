@@ -69,7 +69,7 @@ struct HelpView: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 18))
-                            .foregroundColor(AppColors.blue)
+                    .foregroundColor(AppColors.blue)
                     }
                 }
             }

@@ -15,82 +15,82 @@ struct LocalNewsView: View {
                 VStack(spacing: 0) {
                     // Top bar is handled by navigation
                     
-                    ScrollViewReader { scrollProxy in
-                        ScrollView(showsIndicators: true) {
-                            GeometryReader { geometry in
-                                Color.clear.preference(
-                                    key: ScrollOffsetPreferenceKey.self,
-                                    value: geometry.frame(in: .named("scrollView")).minY
-                                )
-                            }
-                            .frame(height: 0)
-                            .id("scrollTop")
-                            
-                            VStack(spacing: 24) {
-                                // Header
-                                VStack(spacing: 8) {
-                                    Text("Local News")
+                ScrollViewReader { scrollProxy in
+                    ScrollView(showsIndicators: true) {
+                        GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: ScrollOffsetPreferenceKey.self,
+                                value: geometry.frame(in: .named("scrollView")).minY
+                            )
+                        }
+                        .frame(height: 0)
+                        .id("scrollTop")
+                        
+                        VStack(spacing: 24) {
+                            // Header
+                            VStack(spacing: 8) {
+                                Text("Local News")
                                         .font(.system(size: 28, weight: .bold))
                                         .frame(maxWidth: .infinity, alignment: .center)
-                                    Text("Latest updates from Bay Area sources")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
+                                Text("Latest updates from Bay Area sources")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
                                 .padding(.top, 8)
-                                .padding(.bottom, 10)
-                                
-                                if viewModel.isLoading {
-                                    ProgressView()
-                                        .padding()
-                                        .frame(height: 200)
-                                } else if viewModel.currentArticles.isEmpty {
-                                    VStack(spacing: 12) {
-                                        Image(systemName: "newspaper")
-                                            .font(.largeTitle)
-                                            .foregroundColor(.gray)
-                                        Text("Loading articles...")
-                                            .font(.headline)
-                                            .foregroundColor(.gray)
-                                    }
+                            .padding(.bottom, 10)
+                            
+                            if viewModel.isLoading {
+                                ProgressView()
                                     .padding()
-                                    .frame(height: 300)
-                                } else {
-                                    LazyVStack(spacing: 20) {
-                                        ForEach(viewModel.currentArticles) { article in
-                                            NewsItemView(item: article)
-                                                .id(article.id)
-                                        }
-                                        Spacer().frame(height: 60)
+                                        .frame(height: 200)
+                            } else if viewModel.currentArticles.isEmpty {
+                                VStack(spacing: 12) {
+                                    Image(systemName: "newspaper")
+                                        .font(.largeTitle)
+                                        .foregroundColor(.gray)
+                                    Text("Loading articles...")
+                                        .font(.headline)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding()
+                                .frame(height: 300)
+                            } else {
+                                LazyVStack(spacing: 20) {
+                                    ForEach(viewModel.currentArticles) { article in
+                                        NewsItemView(item: article)
+                                            .id(article.id)
                                     }
-                                    .padding(.horizontal)
-                                    .animation(.easeInOut(duration: 0.5), value: viewModel.currentArticles)
+                                    Spacer().frame(height: 60)
                                 }
+                                .padding(.horizontal)
+                                .animation(.easeInOut(duration: 0.5), value: viewModel.currentArticles)
                             }
+                        }
                             .padding(.horizontal)
-                        }
-                        .coordinateSpace(name: "scrollView")
-                        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                            scrollOffset = value
-                            showScrollToTop = value < -200
-                        }
-                        .refreshable {
-                            await viewModel.fetchLocalNews()
-                        }
-                        
-                        if showScrollToTop {
-                            Button(action: {
-                                withAnimation {
-                                    scrollProxy.scrollTo("scrollTop", anchor: .top)
-                                }
-                            }) {
-                                Image(systemName: "arrow.up.circle.fill")
-                                    .font(.system(size: 40))
-                                    .foregroundColor(AppColors.red.opacity(0.8))
-                                    .shadow(radius: 3)
+                    }
+                    .coordinateSpace(name: "scrollView")
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                        scrollOffset = value
+                        showScrollToTop = value < -200
+                    }
+                    .refreshable {
+                        await viewModel.fetchLocalNews()
+                    }
+                    
+                    if showScrollToTop {
+                        Button(action: {
+                            withAnimation {
+                                scrollProxy.scrollTo("scrollTop", anchor: .top)
                             }
-                            .padding(.trailing, 20)
-                            .padding(.bottom, 20)
-                            .transition(.scale.combined(with: .opacity))
+                        }) {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(AppColors.red.opacity(0.8))
+                                .shadow(radius: 3)
+                        }
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 20)
+                        .transition(.scale.combined(with: .opacity))
                         }
                     }
                 }

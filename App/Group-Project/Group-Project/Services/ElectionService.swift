@@ -23,32 +23,52 @@ class ElectionService {
         
         print("Fetching elections from URL: \(url)")
         
-        let (data, response) = try await URLSession.shared.data(from: url)
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw ElectionError.invalidResponse
-        }
-        
-        print("Response status code: \(httpResponse.statusCode)")
-        
-        if !(200...299).contains(httpResponse.statusCode) {
-            if let errorString = String(data: data, encoding: .utf8) {
-                print("Error response: \(errorString)")
-            }
-            throw ElectionError.invalidResponse
-        }
+        // Create a custom URLSession with a timeout
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 15 // 15 seconds timeout
+        config.waitsForConnectivity = true
+        let session = URLSession(configuration: config)
         
         do {
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("Received JSON: \(jsonString)")
+            let (data, response) = try await session.data(from: url)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw ElectionError.invalidResponse
             }
             
-            let decoder = JSONDecoder()
-            let result = try decoder.decode(ElectionsResponse.self, from: data)
-            return result.elections
+            print("Response status code: \(httpResponse.statusCode)")
+            
+            if !(200...299).contains(httpResponse.statusCode) {
+                if let errorString = String(data: data, encoding: .utf8) {
+                    print("Error response: \(errorString)")
+                }
+                throw ElectionError.invalidResponse
+            }
+            
+            do {
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("Received JSON: \(jsonString)")
+                }
+                
+                let decoder = JSONDecoder()
+                let result = try decoder.decode(ElectionsResponse.self, from: data)
+                return result.elections
+            } catch {
+                print("Decoding error: \(error)")
+                throw ElectionError.invalidData
+            }
+        } catch let urlError as URLError {
+            print("URL Session error: \(urlError)")
+            switch urlError.code {
+            case .notConnectedToInternet, .networkConnectionLost:
+                // Use mock data when offline
+                return mockElections()
+            default:
+                throw ElectionError.networkError
+            }
         } catch {
-            print("Decoding error: \(error)")
-            throw ElectionError.invalidData
+            print("Unknown error: \(error)")
+            throw ElectionError.networkError
         }
     }
     
@@ -78,5 +98,30 @@ class ElectionService {
         } catch {
             throw ElectionError.invalidData
         }
+    }
+    
+    // Mock data to use when offline
+    private func mockElections() -> [Election] {
+        let currentYear = Calendar.current.component(.year, from: Date())
+        return [
+            Election(
+                id: "mock-election-1",
+                name: "US Presidential Election",
+                electionDay: "\(currentYear)-11-05",
+                ocdDivisionId: "ocd-division/country:us"
+            ),
+            Election(
+                id: "mock-election-2",
+                name: "California Primary Election",
+                electionDay: "\(currentYear)-03-05",
+                ocdDivisionId: "ocd-division/country:us/state:ca"
+            ),
+            Election(
+                id: "mock-election-3",
+                name: "New York Primary Election",
+                electionDay: "\(currentYear)-04-28",
+                ocdDivisionId: "ocd-division/country:us/state:ny"
+            )
+        ]
     }
 } 
