@@ -505,8 +505,10 @@ extension ElectionCalendarViewModel: CLLocationManagerDelegate {
 struct ElectionCalendarView: View {
     @StateObject private var viewModel = ElectionCalendarViewModel()
     @EnvironmentObject private var menuState: MenuState
+    @Environment(\.presentationMode) var presentationMode
     let onLogoTap: () -> Void
     var showTopBar: Bool = true
+    var isEmbedded: Bool = false
 
     var body: some View {
         NavigationView {
@@ -526,11 +528,32 @@ struct ElectionCalendarView: View {
                             onSearchTap: {},
                             showBackButton: true,
                             onBackTap: {
-                                withAnimation {
-                                    menuState.returnToMainView()
+                                if isEmbedded {
+                                    presentationMode.wrappedValue.dismiss()
+                                } else {
+                                    withAnimation {
+                                        menuState.returnToMainView()
+                                    }
                                 }
                             }
                         )
+                    } else if isEmbedded {
+                        // Add back button when embedded but no top bar
+                        HStack {
+                            Button(action: {
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                HStack {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(AppColors.blue)
+                                    Text("Back")
+                                        .foregroundColor(AppColors.blue)
+                                }
+                                .padding()
+                            }
+                            Spacer()
+                        }
                     }
                     
                     // Calendar header
@@ -634,7 +657,11 @@ struct ElectionCalendarView: View {
                         }
                         Button {
                             withAnimation {
-                                menuState.showingCalendar = false
+                                if isEmbedded {
+                                    presentationMode.wrappedValue.dismiss()
+                                } else {
+                                    menuState.showingCalendar = false
+                                }
                             }
                         } label: {
                             Image(systemName: "xmark")

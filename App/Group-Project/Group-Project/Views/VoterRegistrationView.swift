@@ -6,6 +6,7 @@ import Combine
 
 struct VoterRegistrationView: View {
     @EnvironmentObject private var menuState: MenuState
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedSection: InfoSection = .registration
     @State private var selectedDetail: DetailInfo?
     @State private var showingHelpView = false
@@ -48,10 +49,7 @@ struct VoterRegistrationView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        withAnimation {
-                            menuState.showingVoterRegistration = false
-                            menuState.showingHelp = false
-                        }
+                        dismiss()
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 18))
@@ -72,7 +70,9 @@ struct VoterRegistrationView: View {
             .sheet(item: $selectedDetail) { detail in
                 DetailView(detail: detail)
             }
-            .fullScreenCover(isPresented: $showingHelpView) {
+            .fullScreenCover(isPresented: $showingHelpView, onDismiss: {
+                // Handle any cleanup if needed
+            }) {
                 HelpView()
                     .environmentObject(menuState)
             }
@@ -263,11 +263,13 @@ struct DetailView: View {
             }
             .navigationTitle(detail.title)
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                trailing: Button("Done") {
-                    dismiss()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
                 }
-            )
+            }
         }
     }
 }

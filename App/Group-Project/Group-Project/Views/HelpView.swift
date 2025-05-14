@@ -65,7 +65,7 @@ struct HelpView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        menuState.returnToMainView()
+                        dismiss()
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 18))

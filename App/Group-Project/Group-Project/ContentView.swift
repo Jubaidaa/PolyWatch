@@ -183,10 +183,12 @@ struct ContentView: View {
                 UserProfileView()
             }
             .fullScreenCover(isPresented: $rootMenuState.showingHelp) {
-                VoterRegistrationView()
+                HelpView()
                     .environmentObject(rootMenuState)
             }
-            .fullScreenCover(isPresented: $rootMenuState.showingVoterRegistration) {
+            .fullScreenCover(isPresented: $rootMenuState.showingVoterRegistration, onDismiss: {
+                // Handle any cleanup after the voter registration view is dismissed
+            }) {
                 VoterRegistrationView()
                     .environmentObject(rootMenuState)
             }

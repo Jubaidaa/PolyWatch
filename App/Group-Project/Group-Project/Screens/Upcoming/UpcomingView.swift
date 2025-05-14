@@ -90,8 +90,13 @@ struct UpcomingView: View {
                                     menuState.returnToMainView()
                                 }
                             },
-                            showTopBar: false
+                            showTopBar: false,
+                            isEmbedded: true
                         )
+                        .environmentObject(menuState)
+                        .onDisappear {
+                            // Handle any cleanup if needed when returning from the calendar view
+                        }
                     }
                 }
                 
