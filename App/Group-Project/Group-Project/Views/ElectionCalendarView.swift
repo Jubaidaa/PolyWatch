@@ -515,6 +515,16 @@ struct ElectionCalendarView: View {
             ZStack(alignment: .leading) {
                 Color(.systemBackground)
                     .ignoresSafeArea()
+                
+                // This overlay will hide the blue back button
+                VStack {
+                    Rectangle()
+                        .fill(AppColors.red)
+                        .frame(height: 50)
+                        .edgesIgnoringSafeArea(.top)
+                    Spacer()
+                }
+                .zIndex(99)
 
                 VStack(spacing: 16) {
                     if showTopBar {
@@ -538,22 +548,9 @@ struct ElectionCalendarView: View {
                             }
                         )
                     } else if isEmbedded {
-                        // Add back button when embedded but no top bar
-                        HStack {
-                            Button(action: {
-                                presentationMode.wrappedValue.dismiss()
-                            }) {
-                                HStack {
-                                    Image(systemName: "xmark")
-                                        .font(.system(size: 18))
-                                        .foregroundColor(AppColors.blue)
-                                    Text("Back")
-                                        .foregroundColor(AppColors.blue)
-                                }
-                                .padding()
-                            }
-                            Spacer()
-                        }
+                        // Remove the back button when embedded but no top bar
+                        // Empty space instead
+                        Spacer().frame(height: 10)
                     }
                     
                     // Calendar header
@@ -643,6 +640,9 @@ struct ElectionCalendarView: View {
                 }
             }
             .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
+            .navigationBarTitle("", displayMode: .inline)
+            .navigationBarItems(leading: EmptyView())
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     HStack {
@@ -672,6 +672,7 @@ struct ElectionCalendarView: View {
                 }
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 

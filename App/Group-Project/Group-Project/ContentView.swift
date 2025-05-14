@@ -1,6 +1,15 @@
 import SwiftUI
 import Foundation
 
+// Hide back button text globally
+extension UINavigationController {
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationBar.backItem?.backButtonTitle = ""
+        navigationBar.topItem?.backButtonTitle = ""
+    }
+}
+
 // MARK: - Main ContentView
 
 struct ContentView: View {

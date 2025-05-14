@@ -9,6 +9,17 @@ struct UpcomingView: View {
     @EnvironmentObject private var menuState: MenuState
     let onLogoTap: () -> Void
     
+    init(onLogoTap: @escaping () -> Void) {
+        self.onLogoTap = onLogoTap
+        // Hide back button text
+        UINavigationBar.appearance().backIndicatorImage = UIImage()
+        UINavigationBar.appearance().backIndicatorTransitionMaskImage = UIImage()
+        
+        // Remove the text
+        let barAppearance = UIBarButtonItem.appearance()
+        barAppearance.setBackButtonTitlePositionAdjustment(UIOffset(horizontal: -200, vertical: 0), for: .default)
+    }
+    
     enum ViewType {
         case list
         case calendar
@@ -22,126 +33,139 @@ struct UpcomingView: View {
     }
     
     var body: some View {
-        ZStack {
-            AppColors.white
-                .ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                TopBarView(
-                    onMenuTap: {
-                        withAnimation { menuState.isShowing = true }
-                    },
-                    onLogoTap: {
-                        withAnimation {
-                            menuState.returnToMainView()
-                        }
-                    },
-                    onSearchTap: {},
-                    showBackButton: true,
-                    onBackTap: {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                )
+        NavigationView {
+            ZStack {
+                AppColors.white
+                    .ignoresSafeArea()
                 
-                if viewModel.isLoading {
-                    Spacer()
-                    ProgressView("Loading elections...")
-                    Spacer()
-                    
-                } else if let error = viewModel.error {
-                    Spacer()
-                    VStack(spacing: Constants.Padding.standard) {
-                        Text("😕")
-                            .font(.system(size: 64))
-                        Text(error.description)
-                            .multilineTextAlignment(.center)
-                        Button("Try Again") {
-                            viewModel.fetchElections()
+                VStack(spacing: 0) {
+                    TopBarView(
+                        onMenuTap: {
+                            withAnimation { menuState.isShowing = true }
+                        },
+                        onLogoTap: {
+                            withAnimation {
+                                menuState.returnToMainView()
+                            }
+                        },
+                        onSearchTap: {},
+                        showBackButton: true,
+                        onBackTap: {
+                            presentationMode.wrappedValue.dismiss()
                         }
-                        .buttonStyle(PrimaryButtonStyle())
-                    }
-                    .padding()
-                    Spacer()
+                    )
                     
-                } else if viewModel.elections.isEmpty {
-                    Spacer()
-                    Image("vote")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: UIScreen.main.bounds.width * 0.85)
-                        .padding(.vertical, Constants.Padding.standard / 2)
-                        .accessibilityLabel("Voting Information")
-                    Spacer()
-                    
-                } else {
-                    if selectedView == .list {
-                        ScrollView {
-                            LazyVStack(spacing: Constants.Padding.standard) {
-                                ForEach(filteredElections.sorted { $0.electionDay < $1.electionDay }) { election in
-                                    ElectionCard(election: election, dateFormatter: viewModel.formatDate)
-                                        .padding(.horizontal)
+                    if viewModel.isLoading {
+                        Spacer()
+                        ProgressView("Loading elections...")
+                        Spacer()
+                        
+                    } else if let error = viewModel.error {
+                        Spacer()
+                        VStack(spacing: Constants.Padding.standard) {
+                            Text("😕")
+                                .font(.system(size: 64))
+                            Text(error.description)
+                                .multilineTextAlignment(.center)
+                            Button("Try Again") {
+                                viewModel.fetchElections()
+                            }
+                            .buttonStyle(PrimaryButtonStyle())
+                        }
+                        .padding()
+                        Spacer()
+                        
+                    } else if viewModel.elections.isEmpty {
+                        Spacer()
+                        Image("vote")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: UIScreen.main.bounds.width * 0.85)
+                            .padding(.vertical, Constants.Padding.standard / 2)
+                            .accessibilityLabel("Voting Information")
+                        Spacer()
+                        
+                    } else {
+                        if selectedView == .list {
+                            ScrollView {
+                                LazyVStack(spacing: Constants.Padding.standard) {
+                                    ForEach(filteredElections.sorted { $0.electionDay < $1.electionDay }) { election in
+                                        ElectionCard(election: election, dateFormatter: viewModel.formatDate)
+                                            .padding(.horizontal)
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        ElectionCalendarView(
-                            onLogoTap: {
-                                withAnimation {
-                                    menuState.returnToMainView()
+                        } else {
+                            NavigationView {
+                                ElectionCalendarView(
+                                    onLogoTap: {
+                                        withAnimation {
+                                            menuState.returnToMainView()
+                                        }
+                                    },
+                                    showTopBar: true,
+                                    isEmbedded: true
+                                )
+                                .environmentObject(menuState)
+                                .navigationBarHidden(true)
+                                .navigationBarBackButtonHidden(true)
+                                .toolbar {
+                                    ToolbarItem(placement: .navigationBarLeading) {
+                                        EmptyView()
+                                    }
                                 }
-                            },
-                            showTopBar: false,
-                            isEmbedded: true
-                        )
-                        .environmentObject(menuState)
-                        .onDisappear {
-                            // Handle any cleanup if needed when returning from the calendar view
+                            }
+                            .navigationViewStyle(StackNavigationViewStyle())
                         }
-                    }
-                }
-                
-                // Voter Action Buttons
-                VStack(spacing: Constants.Padding.standard) {
-                    Button {
-                        showVoterRegistration = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "pencil.circle.fill")
-                                .font(.title2)
-                            Text("Register to Vote")
-                                .font(.headline)
-                        }
-                    }
-                    .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
-                    .accessibilityHint("Shows California voter registration info")
-                    .sheet(isPresented: $showVoterRegistration) {
-                        VoterRegistrationView()
-                            .environmentObject(menuState)
                     }
                     
-                    Button {
-                        if let url = URL(string: Constants.URLs.checkVoterStatus) {
-                            UIApplication.shared.open(url)
+                    // Voter Action Buttons
+                    VStack(spacing: Constants.Padding.standard) {
+                        Button {
+                            showVoterRegistration = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "pencil.circle.fill")
+                                    .font(.title2)
+                                Text("Register to Vote")
+                                    .font(.headline)
+                            }
                         }
-                    } label: {
-                        HStack {
-                            Image(systemName: "person.text.rectangle.fill")
-                                .font(.title2)
-                            Text("Check Voter Status")
-                                .font(.headline)
+                        .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.primary))
+                        .accessibilityHint("Shows California voter registration info")
+                        .sheet(isPresented: $showVoterRegistration) {
+                            VoterRegistrationView()
+                                .environmentObject(menuState)
                         }
+                        
+                        Button {
+                            if let url = URL(string: Constants.URLs.checkVoterStatus) {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "person.text.rectangle.fill")
+                                    .font(.title2)
+                                Text("Check Voter Status")
+                                    .font(.headline)
+                            }
+                        }
+                        .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.secondary))
+                        .accessibilityHint("Opens voter status check website")
                     }
-                    .buttonStyle(PrimaryButtonStyle(backgroundColor: AppColors.Button.secondary))
-                    .accessibilityHint("Opens voter status check website")
+                    .padding(.horizontal, Constants.Padding.large)
+                    .padding(.bottom, Constants.Padding.bottom)
                 }
-                .padding(.horizontal, Constants.Padding.large)
-                .padding(.bottom, Constants.Padding.bottom)
+            }
+            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
+            .onAppear {
+                viewModel.fetchElections()
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .navigationBarHidden(true)
-        .onAppear {
-            viewModel.fetchElections()
-        }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
